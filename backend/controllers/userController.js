@@ -28,7 +28,9 @@ const authUser = async (req, res) => {
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
-    if (!email.includes('@') || !email.includes('.')) {
+    const atIndex = email.indexOf('@');
+    const dotIndex = email.lastIndexOf('.');
+    if (atIndex < 1 || dotIndex < atIndex + 2 || dotIndex === email.length - 1) {
         return res.status(400).json({ message: 'Please enter a valid email' });
     }
 

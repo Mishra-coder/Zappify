@@ -1,21 +1,8 @@
-import React from 'react';
 import ProductCard from './ProductCard';
 
-const ProductGrid = ({ products, onProductClick, sortOption, onSortChange, onToggleWishlist, isWishlisted }) => {
+const ProductGrid = ({ products, onProductClick, onToggleWishlist, isWishlisted }) => {
   return (
     <div className="main-content">
-      <div className="content-header">
-        <div></div>
-        <div className="sort-dropdown">
-          <select value={sortOption} onChange={(e) => onSortChange(e.target.value)}>
-            <option value="recommended">Select Sorting Options</option>
-            <option value="low-high">Price: Low to High</option>
-            <option value="high-low">Price: High to Low</option>
-            <option value="newest">New Arrivals</option>
-          </select>
-        </div>
-      </div>
-
       <div className="product-grid">
         {products.map((product) => (
           <ProductCard

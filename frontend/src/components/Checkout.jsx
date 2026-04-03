@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, MapPin, CreditCard, ShoppingBag, Check } from 'lucide-react';
+import { X, ChevronRight, MapPin, CreditCard, Check } from 'lucide-react';
 
 const STEPS = ['MY BAG', 'ADDRESS', 'PAYMENT'];
 
-const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
+const Checkout = ({ cartItems, onClose, onOrderPlaced }) => {
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState({ name: '', phone: '', pincode: '', city: '', state: '', street: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -23,11 +23,7 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
     return (
       <div className="checkout-overlay">
         <div className="checkout-modal">
-          <motion.div
-            className="order-success"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-          >
+          <motion.div className="order-success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
             <div className="success-icon"><Check size={40} /></div>
             <h2>Order Placed!</h2>
             <p>Your order has been placed successfully. You'll receive a confirmation soon.</p>
@@ -40,36 +36,26 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
 
   return (
     <div className="checkout-overlay">
-      <motion.div
-        className="checkout-modal"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 40 }}
-      >
-        {/* Header */}
+      <motion.div className="checkout-modal" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }}>
         <div className="checkout-header">
           <h2>CHECKOUT</h2>
           <button className="close-btn" onClick={onClose}><X size={22} /></button>
         </div>
 
-        {/* Steps */}
         <div className="checkout-steps">
           {STEPS.map((s, i) => (
-            <React.Fragment key={s}>
+            <div key={s} style={{ display: 'flex', alignItems: 'center', flex: i < STEPS.length - 1 ? 1 : 'none' }}>
               <div className={`step-item ${i <= step ? 'active' : ''} ${i < step ? 'done' : ''}`}>
                 <div className="step-circle">{i < step ? <Check size={14} /> : i + 1}</div>
                 <span>{s}</span>
               </div>
               {i < STEPS.length - 1 && <div className={`step-line ${i < step ? 'done' : ''}`} />}
-            </React.Fragment>
+            </div>
           ))}
         </div>
 
-        {/* Step Content */}
         <div className="checkout-body">
           <AnimatePresence mode="wait">
-
-            {/* STEP 1: MY BAG */}
             {step === 0 && (
               <motion.div key="bag" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="co-items">
@@ -103,7 +89,6 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
               </motion.div>
             )}
 
-            {/* STEP 2: ADDRESS */}
             {step === 1 && (
               <motion.div key="address" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="co-address-form">
@@ -121,23 +106,19 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
                 </div>
                 <div className="co-btn-row">
                   <button className="btn-outline co-back-btn" onClick={() => setStep(0)}>BACK</button>
-                  <button
-                    className="btn-primary co-next-btn"
-                    onClick={() => {
-                      if (!address.name || !address.phone || !address.street || !address.city || !address.pincode) {
-                        alert('Please fill all required fields');
-                        return;
-                      }
-                      setStep(2);
-                    }}
-                  >
+                  <button className="btn-primary co-next-btn" onClick={() => {
+                    if (!address.name || !address.phone || !address.street || !address.city || !address.pincode) {
+                      alert('Please fill all required fields');
+                      return;
+                    }
+                    setStep(2);
+                  }}>
                     PROCEED TO PAYMENT <ChevronRight size={18} />
                   </button>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 3: PAYMENT */}
             {step === 2 && (
               <motion.div key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="co-payment">
@@ -154,7 +135,6 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
                       </label>
                     ))}
                   </div>
-
                   <div className="co-billing">
                     <h4>ORDER SUMMARY</h4>
                     <div className="billing-row"><span>Cart Total</span><span>₹ {cartTotal.toLocaleString('en-IN')}</span></div>
@@ -164,13 +144,10 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
                 </div>
                 <div className="co-btn-row">
                   <button className="btn-outline co-back-btn" onClick={() => setStep(1)}>BACK</button>
-                  <button className="btn-primary co-next-btn place-order-btn" onClick={handlePlaceOrder}>
-                    PLACE ORDER
-                  </button>
+                  <button className="btn-primary co-next-btn place-order-btn" onClick={handlePlaceOrder}>PLACE ORDER</button>
                 </div>
               </motion.div>
             )}
-
           </AnimatePresence>
         </div>
       </motion.div>

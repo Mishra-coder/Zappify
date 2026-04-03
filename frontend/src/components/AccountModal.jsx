@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, Package, LogOut, ArrowLeft, ChevronRight } from 'lucide-react';
 
@@ -13,10 +13,7 @@ const CANCEL_REASONS = [
 
 const TRACKING_STEPS = ['Order Placed', 'Shipped', 'In-Transit', 'Out For Delivery', 'Delivered'];
 
-const formatDate = (dateStr) => {
-  const d = new Date(dateStr);
-  return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
-};
+const formatDate = (dateStr) => new Date(dateStr).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 
 const getEstDelivery = (dateStr) => {
   const d = new Date(dateStr);
@@ -25,7 +22,7 @@ const getEstDelivery = (dateStr) => {
 };
 
 const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
-  const [view, setView] = useState('main'); // main | detail | cancel | cancelled
+  const [view, setView] = useState('main');
   const [selectedOrder, setSelectedOrder] = useState(null);
   const [cancelReason, setCancelReason] = useState('');
   const [remarks, setRemarks] = useState('');
@@ -67,12 +64,10 @@ const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
         </div>
 
         <div className="account-body">
-
-          {/* ── MAIN VIEW ── */}
           {view === 'main' && (
             <>
               <div className="account-profile-card">
-                <img src={user.picture} alt={user.name} className="account-avatar" />
+                <img src={user.picture || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.name)}&background=e85d04&color=fff`} alt={user.name} className="account-avatar" />
                 <div>
                   <p className="account-name">{user.name}</p>
                   <p className="account-email">{user.email}</p>
@@ -115,7 +110,6 @@ const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
             </>
           )}
 
-          {/* ── ORDER DETAIL VIEW ── */}
           {view === 'detail' && selectedOrder && (
             <div className="order-detail-view">
               <div className="od-header">
@@ -136,7 +130,6 @@ const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
                 </div>
               </div>
 
-              {/* Tracking */}
               {selectedOrder.status !== 'Cancelled' ? (
                 <div className="od-tracking">
                   {TRACKING_STEPS.map((step, i) => (
@@ -159,7 +152,6 @@ const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
             </div>
           )}
 
-          {/* ── CANCEL VIEW ── */}
           {view === 'cancel' && selectedOrder && (
             <div className="cancel-view">
               <div className="od-header">
@@ -194,10 +186,8 @@ const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
               </div>
             </div>
           )}
-
         </div>
 
-        {/* Confirmation Popup */}
         <AnimatePresence>
           {showConfirmPopup && (
             <motion.div className="cancel-popup-overlay" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>

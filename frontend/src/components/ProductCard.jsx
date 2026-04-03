@@ -1,4 +1,3 @@
-import React from 'react';
 import { Heart, TrendingUp } from 'lucide-react';
 import { motion } from 'framer-motion';
 

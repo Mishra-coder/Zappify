@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, Heart, Share2, ShieldCheck, X } from 'lucide-react';
 
@@ -17,10 +17,7 @@ const ProductDetail = ({ product, onBack, onAddToCart, onToggleWishlist, isWishl
   const sizes = ['7', '8', '9', '10', '11'];
 
   const handleAddToCart = () => {
-    if (!selectedSize) {
-      alert('Please select a size first');
-      return;
-    }
+    if (!selectedSize) { alert('Please select a size first'); return; }
     onAddToCart(product, selectedSize);
     alert(`${product.name} (UK ${selectedSize}) added to cart!`);
   };
@@ -46,7 +43,6 @@ const ProductDetail = ({ product, onBack, onAddToCart, onToggleWishlist, isWishl
           <span className="brand-tag">{product.brand}</span>
           <h1 className="product-title">{product.name}</h1>
           <p className="product-cat">{product.category}</p>
-
           <div className="price-tag">₹ {product.price.toLocaleString('en-IN')}</div>
 
           <div className="description-box">

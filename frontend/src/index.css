@@ -143,7 +143,7 @@ ul {
         .footer-bottom { text-align: center; font-size: 0.85rem; color: var(--slate-600); font-weight: 500; }
         .grid-view { width: 100%; }
         .detail-view { width: 100%; padding: 2rem 0; }
-        @media (max-width: 1024px) {
+        @media (max-width: 600px) {
           .layout-split { flex-direction: column; }
           .container-broad { padding: 0 1rem; }
         }
@@ -291,9 +291,8 @@ ul {
           position: sticky;
           top: 0;
           z-index: 1000;
-          height: 80px;
-          display: flex;
-          align-items: center;
+          background: var(--white);
+          border-bottom: 1px solid var(--slate-100);
           transition: var(--transition-smooth);
         }
 
@@ -301,58 +300,42 @@ ul {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          gap: 2rem;
-        }
-
-        .logo-section {
-          display: flex;
-          align-items: center;
-          gap: 2rem;
+          padding: 16px 0 8px;
         }
 
         .brand-logo {
           font-family: 'Outfit', sans-serif;
-          font-size: 2.2rem;
-          font-weight: 800;
+          font-size: 1.8rem;
+          font-weight: 900;
           color: var(--deep-slate);
-          letter-spacing: -1.5px;
+          letter-spacing: -1px;
         }
 
         .logo-accent {
           color: var(--brand-red);
         }
 
-        .nav-links {
+        .header-search {
           display: flex;
-          gap: 2.5rem;
-          list-style: none;
+          align-items: center;
+          gap: 10px;
+          background: var(--slate-100);
+          border-radius: 14px;
+          padding: 10px 16px;
+          margin-bottom: 12px;
         }
 
-        .nav-item {
-          font-size: 1rem;
-          font-weight: 700;
-          color: var(--slate-600);
-          position: relative;
-          padding: 0.5rem 0;
-          letter-spacing: 0.5px;
-          background: none;
+        .header-search input {
+          flex: 1;
           border: none;
-          cursor: pointer;
-          transition: 0.3s;
+          background: transparent;
+          font-size: 14px;
+          color: var(--deep-slate);
+          outline: none;
         }
 
-        .nav-item.active {
-          color: var(--brand-red);
-        }
-
-        .nav-item.active::after {
-          content: '';
-          position: absolute;
-          bottom: 0;
-          left: 0;
-          width: 100%;
-          height: 3px;
-          background: var(--brand-red);
+        .header-search input::placeholder {
+          color: var(--slate-400);
         }
 
         .search-container {
@@ -566,36 +549,28 @@ ul {
         .content-header {
           display: flex;
           align-items: center;
-          justify-content: space-between;
-          margin-bottom: 3rem;
+          justify-content: flex-end;
+          margin-bottom: 1.5rem;
           border-bottom: 1px solid var(--slate-100);
-          padding-bottom: 1.5rem;
+          padding-bottom: 1rem;
         }
 
-        .breadcrumb {
-          font-size: 0.9rem;
-          color: var(--slate-400);
-          font-weight: 600;
-          letter-spacing: 0.5px;
-        }
-
-        .breadcrumb .count {
-          color: var(--slate-700);
-          font-weight: 800;
-          margin-left: 0.5rem;
+        .sort-dropdown {
+          margin-left: auto;
         }
 
         .sort-dropdown select {
-          padding: 0.8rem 1.5rem;
+          padding: 0.4rem 0.8rem;
           border: 1px solid var(--slate-200);
           border-radius: var(--radius-md);
-          font-size: 0.9rem;
+          font-size: 0.75rem;
           background: white;
           color: var(--slate-700);
           font-weight: 600;
           outline: none;
           cursor: pointer;
           transition: var(--transition-smooth);
+          width: fit-content;
         }
 
         .sort-dropdown select:hover {
@@ -1195,3 +1170,11 @@ ul {
 /* Sneakers Banner */
 .sneakers-banner-full { width: 100%; overflow: hidden; margin-bottom: 0; }
 .sneakers-banner-full img { width: 100%; aspect-ratio: 16 / 7; display: block; object-fit: cover; object-position: center center; }
+
+/* Category Chips */
+.category-chips { display: flex; gap: 8px; padding: 12px 0; overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap; }
+.category-chips::-webkit-scrollbar { display: none; }
+.cat-chip { flex-shrink: 0; padding: 8px 16px; border-radius: 20px; background: #f5f5f5; border: none; cursor: pointer; font-size: 13px; font-weight: 600; color: #888; white-space: nowrap; transition: all 0.2s; }
+.cat-chip.active { background: #e85d04; color: #fff; }
+.cat-chip:hover { background: #ffe8e0; color: #e85d04; }
+.cat-chip.active:hover { background: #e85d04; color: #fff; }
