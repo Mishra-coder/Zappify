@@ -3,13 +3,37 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvo
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
+
+GoogleSignin.configure({
+  webClientId: '1076957044730-mht8sbihb0d4661hprrvbjf9v4gb0njr.apps.googleusercontent.com',
+  offlineAccess: true,
+});
 
 export default function LoginScreen({ navigation }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const { login } = useApp();
+
+  const handleGoogleSignIn = async () => {
+    try {
+      await GoogleSignin.hasPlayServices();
+      const userInfo = await GoogleSignin.signIn();
+      const user = {
+        name: userInfo.data.user.name,
+        email: userInfo.data.user.email,
+        picture: userInfo.data.user.photo,
+      };
+      await login(user);
+      navigation.goBack();
+    } catch (error) {
+      if (error.code === statusCodes.SIGN_IN_CANCELLED) return;
+      if (error.code === statusCodes.IN_PROGRESS) return;
+      Alert.alert('Google Sign In Failed', error.message);
+    }
+  };
 
   const handleAuth = async () => {
     if (!form.email || !form.password) { Alert.alert('Error', 'Please fill all fields'); return; }
@@ -59,6 +83,17 @@ export default function LoginScreen({ navigation }) {
             <Text style={styles.authBtnTxt}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</Text>
           </TouchableOpacity>
 
+          <View style={styles.separator}>
+            <View style={styles.sepLine} />
+            <Text style={styles.sepTxt}>OR CONTINUE WITH</Text>
+            <View style={styles.sepLine} />
+          </View>
+
+          <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn}>
+            <Text style={styles.googleG}>G</Text>
+            <Text style={styles.googleBtnTxt}>{isSignUp ? 'Sign up with Google' : 'Sign in with Google'}</Text>
+          </TouchableOpacity>
+
           <TouchableOpacity style={styles.switchBtn} onPress={() => setIsSignUp(!isSignUp)}>
             <Text style={styles.switchTxt}>
               {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
@@ -80,6 +115,12 @@ const styles = StyleSheet.create({
   input: { width: '100%', borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, color: colors.dark, marginBottom: 14 },
   authBtn: { width: '100%', backgroundColor: colors.brand, borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 4 },
   authBtnTxt: { color: colors.white, fontWeight: '800', fontSize: 15, letterSpacing: 1 },
+  separator: { flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 16, gap: 10 },
+  sepLine: { flex: 1, height: 1, backgroundColor: colors.border },
+  sepTxt: { fontSize: 11, color: colors.gray, fontWeight: '600', letterSpacing: 0.5 },
+  googleBtn: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingVertical: 14 },
+  googleG: { fontSize: 18, fontWeight: '800', color: '#4285F4' },
+  googleBtnTxt: { fontSize: 14, fontWeight: '600', color: colors.dark },
   switchBtn: { marginTop: 20 },
   switchTxt: { fontSize: 14, color: colors.gray },
   switchLink: { color: colors.brand, fontWeight: '700' },
