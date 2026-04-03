@@ -200,6 +200,8 @@ function App() {
             onToggleWishlist={toggleWishlist}
             onLoginSuccess={handleLogin}
             onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
+            loggedInUser={loggedInUser}
+            onSwitchOverlay={setActiveOverlay}
           />
         )}
       </AnimatePresence>
@@ -241,7 +243,7 @@ function App() {
   )
 }
 
-const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout }) => {
+const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout, loggedInUser, onSwitchOverlay }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const [formData, setFormData] = useState({ name: '', email: '', password: '', confirm: '' });
   const [error, setError] = useState('');
@@ -339,7 +341,14 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                     <span>Total</span>
                     <span>₹ {cartTotal.toLocaleString('en-IN')}</span>
                   </div>
-                  <button className="btn-primary checkout-btn" onClick={onCheckout}>PROCEED TO CHECKOUT</button>
+                  <button className="btn-primary checkout-btn" onClick={() => {
+                    if (!loggedInUser) {
+                      onClose();
+                      setTimeout(() => onSwitchOverlay('login'), 100);
+                    } else {
+                      onCheckout();
+                    }
+                  }}>PROCEED TO CHECKOUT</button>
                 </div>
                 </>
               )
