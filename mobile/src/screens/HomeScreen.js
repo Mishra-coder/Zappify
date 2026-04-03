@@ -70,7 +70,7 @@ export default function HomeScreen({ navigation }) {
         showsHorizontalScrollIndicator={false}
         keyExtractor={item => item}
         style={styles.catList}
-        contentContainerStyle={{ paddingHorizontal: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingVertical: 6, alignItems: 'center' }}
         renderItem={({ item }) => (
           <TouchableOpacity
             style={[styles.catChip, activeCategory === item && styles.catChipActive]}
@@ -113,8 +113,8 @@ const styles = StyleSheet.create({
   avatarSmall: { width: 28, height: 28, borderRadius: 14, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
   searchBar: { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.lightGray, marginHorizontal: 16, borderRadius: 12, paddingHorizontal: 12, paddingVertical: 10, gap: 8, marginBottom: 8 },
   searchInput: { flex: 1, fontSize: 14, color: colors.dark },
-  catList: { marginBottom: 8 },
-  catChip: { paddingHorizontal: 14, paddingVertical: 7, borderRadius: 20, backgroundColor: colors.lightGray, marginRight: 8 },
+  catList: { marginBottom: 10, maxHeight: 48 },
+  catChip: { paddingHorizontal: 16, paddingVertical: 8, borderRadius: 20, backgroundColor: colors.lightGray, marginRight: 8, height: 36, justifyContent: 'center' },
   catChipActive: { backgroundColor: colors.brand },
   catText: { fontSize: 12, fontWeight: '600', color: colors.gray },
   catTextActive: { color: colors.white },
