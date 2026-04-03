@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
 
-const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav, loggedInUser, onLogout }) => {
+const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav, loggedInUser, onLogout, onOpenAccount }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -54,24 +54,9 @@ const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav
           <div className="user-actions">
             {loggedInUser ? (
               <div className="user-profile-wrap">
-                <button className="user-avatar-btn" onClick={() => setShowUserMenu(!showUserMenu)}>
+                <button className="user-avatar-btn" onClick={onOpenAccount}>
                   <img src={loggedInUser.picture} alt={loggedInUser.name} className="user-avatar" />
                 </button>
-                {showUserMenu && (
-                  <div className="user-dropdown">
-                    <div className="user-dropdown-info">
-                      <img src={loggedInUser.picture} alt={loggedInUser.name} className="user-avatar-lg" />
-                      <div>
-                        <p className="user-dropdown-name">{loggedInUser.name}</p>
-                        <p className="user-dropdown-email">{loggedInUser.email}</p>
-                      </div>
-                    </div>
-                    <hr className="dropdown-divider" />
-                    <button className="dropdown-logout" onClick={() => { onLogout(); setShowUserMenu(false); }}>
-                      Logout
-                    </button>
-                  </div>
-                )}
               </div>
             ) : (
               <button className="action-btn" title="Profile" onClick={() => onOpenOverlay('login')}>

@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
 import { GoogleLogin, googleLogout } from '@react-oauth/google'
 import Checkout from './components/Checkout'
+import AccountModal from './components/AccountModal'
 
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -21,6 +22,8 @@ function App() {
   const [sneakersView, setSneakersView] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
   const [showCheckout, setShowCheckout] = useState(false);
+  const [showAccount, setShowAccount] = useState(false);
+  const [placedOrders, setPlacedOrders] = useState([]);
 
   const toggleFilter = (item, type) => {
     if (type === 'category') {
@@ -95,6 +98,7 @@ function App() {
         activeNav={activeNav}
         loggedInUser={loggedInUser}
         onLogout={() => setLoggedInUser(null)}
+        onOpenAccount={() => setShowAccount(true)}
       />
 
       <main className="app-main">
@@ -175,6 +179,16 @@ function App() {
           cartItems={cartItems}
           onClose={() => setShowCheckout(false)}
           onRemoveFromCart={removeFromCart}
+          onOrderPlaced={(items) => setPlacedOrders(prev => [...prev, ...items])}
+        />
+      )}
+
+      {showAccount && loggedInUser && (
+        <AccountModal
+          user={loggedInUser}
+          orders={placedOrders}
+          onClose={() => setShowAccount(false)}
+          onLogout={() => { setLoggedInUser(null); setShowAccount(false); }}
         />
       )}
     </div>

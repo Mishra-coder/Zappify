@@ -1100,3 +1100,26 @@ ul {
 .success-icon { width: 72px; height: 72px; background: #e85d04; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; margin: 0 auto 20px; }
 .order-success h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
 .order-success p { color: #888; margin-bottom: 28px; font-size: 14px; }
+
+/* ── Account Drawer ── */
+.account-body { display: flex; flex-direction: column; gap: 20px; padding: 20px; flex: 1; overflow-y: auto; }
+.account-profile-card { display: flex; align-items: center; gap: 16px; background: #fafafa; border-radius: 16px; padding: 20px; }
+.account-avatar { width: 56px; height: 56px; border-radius: 50%; object-fit: cover; border: 3px solid #e85d04; }
+.account-name { font-weight: 800; font-size: 16px; margin-bottom: 4px; }
+.account-email { font-size: 13px; color: #888; }
+.account-section { background: #fafafa; border-radius: 16px; padding: 20px; }
+.account-section-title { display: flex; align-items: center; gap: 8px; font-size: 12px; font-weight: 800; letter-spacing: 1.5px; color: #aaa; margin-bottom: 16px; }
+.orders-list { display: flex; flex-direction: column; gap: 0; }
+.order-item { display: flex; gap: 12px; align-items: center; padding: 14px 0; border-bottom: 1px solid #f0f0f0; }
+.order-item:last-child { border-bottom: none; }
+.order-item img { width: 64px; height: 64px; object-fit: cover; border-radius: 10px; background: #f0f0f0; }
+.order-info { flex: 1; }
+.order-name { font-weight: 700; font-size: 13px; margin-bottom: 4px; }
+.order-meta { font-size: 12px; color: #888; margin-bottom: 4px; }
+.order-price { font-weight: 800; font-size: 14px; color: #e85d04; }
+.order-status { font-size: 11px; font-weight: 700; color: #16a34a; background: #f0fdf4; padding: 4px 10px; border-radius: 20px; white-space: nowrap; }
+.orders-empty { text-align: center; padding: 24px 0; color: #bbb; }
+.orders-empty p { font-weight: 700; font-size: 15px; margin: 12px 0 4px; color: #555; }
+.orders-empty span { font-size: 13px; color: #aaa; }
+.account-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: 1.5px solid #e8e8e8; border-radius: 12px; background: #fff; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #555; cursor: pointer; }
+.account-logout-btn:hover { border-color: #e85d04; color: #e85d04; }

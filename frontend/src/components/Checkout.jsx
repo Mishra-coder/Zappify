@@ -4,7 +4,7 @@ import { X, ChevronRight, MapPin, CreditCard, ShoppingBag, Check } from 'lucide-
 
 const STEPS = ['MY BAG', 'ADDRESS', 'PAYMENT'];
 
-const Checkout = ({ cartItems, onClose, onRemoveFromCart }) => {
+const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState({ name: '', phone: '', pincode: '', city: '', state: '', street: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -15,6 +15,7 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart }) => {
   const shipping = cartTotal > 999 ? 0 : 99;
 
   const handlePlaceOrder = () => {
+    if (onOrderPlaced) onOrderPlaced(cartItems);
     setOrderPlaced(true);
   };
 
