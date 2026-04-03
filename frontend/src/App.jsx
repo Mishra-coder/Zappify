@@ -207,6 +207,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                   <button className="btn-primary" onClick={onClose}>CONTINUE SHOPPING</button>
                 </div>
               ) : (
+                <>
                 <div className="cart-items">
                   {cartItems.map((item, i) => (
                     <div key={i} className="cart-item">
@@ -222,12 +223,15 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                       </button>
                     </div>
                   ))}
+                </div>
+                <div className="cart-footer">
                   <div className="cart-total">
                     <span>Total</span>
                     <span>₹ {cartTotal.toLocaleString('en-IN')}</span>
                   </div>
                   <button className="btn-primary checkout-btn">PROCEED TO CHECKOUT</button>
                 </div>
+                </>
               )
             ) : (
               wishlistItems.length === 0 ? (
