@@ -1,7 +1,4 @@
 # Zappify Shoes
-
-## About The Project
-
 **Zappify Shoes** is an online shoe store built to sell just *one* premium pair of shoes. Instead of a messy website with hundreds of products, Zappify gives the user a super clean and focused shopping experience for that single product.
 
 ### Simple Breakdown of What It Does:
