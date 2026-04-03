@@ -1017,7 +1017,8 @@ ul {
 
 /* Google Login Button */
 .google-btn-wrap { display: flex; justify-content: center; width: 100%; margin-top: 4px; }
-.google-btn-wrap > div { width: 100% !important; }
+.google-btn-wrap > div { display: flex !important; justify-content: center !important; }
+.google-btn-wrap iframe { margin: 0 auto !important; }
 
 /* User Profile in Header */
 .user-profile-wrap { position: relative; }
@@ -1096,10 +1097,11 @@ ul {
 .payment-option input { accent-color: #e85d04; width: 16px; height: 16px; }
 
 /* Order Success */
-.order-success { text-align: center; padding: 48px 28px; }
+.order-success { text-align: center; padding: 48px 28px; display: flex; flex-direction: column; align-items: center; }
 .success-icon { width: 72px; height: 72px; background: #e85d04; border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; margin: 0 auto 20px; }
 .order-success h2 { font-size: 24px; font-weight: 800; margin-bottom: 10px; }
 .order-success p { color: #888; margin-bottom: 28px; font-size: 14px; }
+.order-success .btn-primary { width: auto; padding: 14px 32px; }
 
 /* ── Account Drawer ── */
 .account-body { display: flex; flex-direction: column; gap: 20px; padding: 20px; flex: 1; overflow-y: auto; }

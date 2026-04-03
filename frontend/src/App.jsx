@@ -358,8 +358,10 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                     onClose();
                   }}
                   onError={() => console.log('Google login failed')}
-                  width="100%"
+                  width="360"
                   text={isSignUp ? 'signup_with' : 'signin_with'}
+                  shape="rectangular"
+                  size="large"
                 />
               </div>
             </div>
