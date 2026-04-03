@@ -1,37 +1,36 @@
-import React, { useState, useMemo } from 'react'
+import { useState, useMemo } from 'react'
 import Header from './components/Header'
-import Sidebar from './components/Sidebar'
 import ProductGrid from './components/ProductGrid'
 import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
-import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
+import { useGoogleLogin } from '@react-oauth/google'
 import Checkout from './components/Checkout'
 import AccountModal from './components/AccountModal'
 
+const CATEGORIES = ['All', 'Men Low Top Sneakers', 'Men High Top Sneakers', 'Men Mid Top Sneakers', 'Men Clogs', 'Men Slip-ons'];
+
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedThemes, setSelectedThemes] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOverlay, setActiveOverlay] = useState(null);
-  const [cartItems, setCartItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('zappify_cart')) || []; } catch { return []; }
-  });
-  const [wishlistItems, setWishlistItems] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('zappify_wishlist')) || []; } catch { return []; }
-  });
-  const [sortOption, setSortOption] = useState('recommended');
-  const [activeNav, setActiveNav] = useState('MEN');
-  const [sneakersView, setSneakersView] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [loggedInUser, setLoggedInUser] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('zappify_user')) || null; } catch { return null; }
-  });
+  const [sneakersView, setSneakersView] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
 
-  const getOrdersKey = (user) => `zappify_orders_${user?.email || 'guest'}`;
+  const [cartItems, setCartItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_cart')) || []; } catch { return []; }
+  });
+
+  const [wishlistItems, setWishlistItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_wishlist')) || []; } catch { return []; }
+  });
+
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_user')) || null; } catch { return null; }
+  });
 
   const [placedOrders, setPlacedOrders] = useState(() => {
     try {
@@ -41,12 +40,13 @@ function App() {
     } catch { return []; }
   });
 
+  const userOrdersKey = (user) => `zappify_orders_${user?.email}`;
+
   const handleLogin = (user) => {
     setLoggedInUser(user);
     localStorage.setItem('zappify_user', JSON.stringify(user));
-    // Load this user's orders
-    const userOrders = JSON.parse(localStorage.getItem(`zappify_orders_${user.email}`)) || [];
-    setPlacedOrders(userOrders);
+    const orders = JSON.parse(localStorage.getItem(userOrdersKey(user))) || [];
+    setPlacedOrders(orders);
   };
 
   const handleLogout = () => {
@@ -55,28 +55,10 @@ function App() {
     setPlacedOrders([]);
   };
 
-  const toggleFilter = (item, type) => {
-    if (type === 'category') {
-      setSelectedCategories(prev =>
-        prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
-      );
-    } else {
-      setSelectedThemes(prev =>
-        prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]
-      );
-    }
-  };
-
   const handleNavigate = (destination) => {
     setSelectedProduct(null);
     setSelectedCategories([]);
-    setSelectedThemes([]);
-    if (destination === 'SNEAKERS') {
-      setSneakersView(true);
-    } else {
-      setSneakersView(false);
-    }
-    if (destination !== 'home') setActiveNav(destination);
+    setSneakersView(destination === 'SNEAKERS');
   };
 
   const addToCart = (product, size) => {
@@ -111,23 +93,16 @@ function App() {
   const isWishlisted = (id) => wishlistItems.some(i => i.id === id);
 
   const filteredProducts = useMemo(() => {
-    let result = ALL_PRODUCTS.filter(product => {
+    return ALL_PRODUCTS.filter(product => {
       const sneakerMatch = sneakersView ? product.id >= 30 && product.id <= 44 : true;
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-      const themeMatch = selectedThemes.length === 0 || selectedThemes.includes(product.theme);
-      const searchMatch = searchQuery.trim() === '' || 
+      const searchMatch = searchQuery.trim() === '' ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return sneakerMatch && categoryMatch && themeMatch && searchMatch;
+      return sneakerMatch && categoryMatch && searchMatch;
     });
-
-    if (sortOption === 'low-high') result = [...result].sort((a, b) => a.price - b.price);
-    else if (sortOption === 'high-low') result = [...result].sort((a, b) => b.price - a.price);
-    else if (sortOption === 'newest') result = [...result].sort((a, b) => b.id - a.id);
-
-    return result;
-  }, [selectedCategories, selectedThemes, sortOption, sneakersView, searchQuery]);
+  }, [selectedCategories, sneakersView, searchQuery]);
 
   return (
     <div className="zappify-app">
@@ -136,9 +111,7 @@ function App() {
         onNavigate={handleNavigate}
         cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
         wishlistCount={wishlistItems.length}
-        activeNav={activeNav}
         loggedInUser={loggedInUser}
-        onLogout={handleLogout}
         onOpenAccount={() => setShowAccount(true)}
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
@@ -156,20 +129,27 @@ function App() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="layout-split">                  <Sidebar
-                    selectedCategories={selectedCategories}
-                    selectedThemes={selectedThemes}
-                    onToggleFilter={toggleFilter}
-                  />
-                  <ProductGrid
-                    products={filteredProducts}
-                    onProductClick={setSelectedProduct}
-                    sortOption={sortOption}
-                    onSortChange={setSortOption}
-                    onToggleWishlist={toggleWishlist}
-                    isWishlisted={isWishlisted}
-                  />
-                </div>              </motion.div>
+                <div className="category-chips">
+                  {CATEGORIES.map(cat => (
+                    <button
+                      key={cat}
+                      className={`cat-chip ${selectedCategories.length === 0 && cat === 'All' ? 'active' : selectedCategories.includes(cat) ? 'active' : ''}`}
+                      onClick={() => cat === 'All'
+                        ? setSelectedCategories([])
+                        : setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
+                      }
+                    >
+                      {cat}
+                    </button>
+                  ))}
+                </div>
+                <ProductGrid
+                  products={filteredProducts}
+                  onProductClick={setSelectedProduct}
+                  onToggleWishlist={toggleWishlist}
+                  isWishlisted={isWishlisted}
+                />
+              </motion.div>
             ) : (
               <motion.div
                 key="detail"
@@ -231,7 +211,7 @@ function App() {
             }));
             const updated = [...placedOrders, ...newOrders];
             setPlacedOrders(updated);
-            localStorage.setItem(getOrdersKey(loggedInUser), JSON.stringify(updated));
+            localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
             setCartItems([]);
             localStorage.removeItem('zappify_cart');
           }}
@@ -247,12 +227,12 @@ function App() {
           onCancelOrder={(orderId) => {
             const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
             setPlacedOrders(updated);
-            localStorage.setItem(getOrdersKey(loggedInUser), JSON.stringify(updated));
+            localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
           }}
         />
       )}
     </div>
-  )
+  );
 }
 
 const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout, loggedInUser, onSwitchOverlay }) => {
@@ -266,16 +246,16 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
     onSuccess: async (tokenResponse) => {
       try {
         const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
-          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` },
         });
         const data = await res.json();
         onLoginSuccess({ name: data.name, email: data.email, picture: data.picture });
         onClose();
-      } catch (e) {
-        console.log('Google login failed', e);
+      } catch {
+        setError('Google sign in failed');
       }
     },
-    onError: () => console.log('Google login failed'),
+    onError: () => setError('Google sign in failed'),
   });
 
   const handleAuth = () => {
@@ -285,7 +265,11 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
       if (!formData.name) { setError('Please enter your name'); return; }
       if (formData.password !== formData.confirm) { setError('Passwords do not match'); return; }
       if (formData.password.length < 6) { setError('Password must be at least 6 characters'); return; }
-      const user = { name: formData.name, email: formData.email, picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=e85d04&color=fff` };
+      const user = {
+        name: formData.name,
+        email: formData.email,
+        picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=e85d04&color=fff`,
+      };
       onLoginSuccess(user);
       onClose();
     } else {
@@ -301,22 +285,10 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
 
   return (
     <div className="overlay-system">
-      <motion.div
-        className="backdrop"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        onClick={onClose}
-      />
+      <motion.div className="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} />
 
       {isDrawer ? (
-        <motion.div
-          className="drawer"
-          initial={{ x: '100%' }}
-          animate={{ x: 0 }}
-          exit={{ x: '100%' }}
-          transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-        >
+        <motion.div className="drawer" initial={{ x: '100%' }} animate={{ x: 0 }} exit={{ x: '100%' }} transition={{ type: 'spring', damping: 25, stiffness: 200 }}>
           <div className="overlay-header">
             <h3>{type === 'cart' ? 'SHOPPING BAG' : 'MY WISHLIST'}</h3>
             <button className="close-btn" onClick={onClose}><X size={24} /></button>
@@ -332,36 +304,36 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                 </div>
               ) : (
                 <>
-                <div className="cart-items">
-                  {cartItems.map((item, i) => (
-                    <div key={i} className="cart-item">
-                      <img src={item.image} alt={item.name} />
-                      <div className="cart-item-info">
-                        <p className="cart-item-name">{item.name}</p>
-                        <p className="cart-item-size">Size: UK {item.size}</p>
-                        <p className="cart-item-qty">Qty: {item.qty}</p>
-                        <p className="cart-item-price">₹ {(item.price * item.qty).toLocaleString('en-IN')}</p>
+                  <div className="cart-items">
+                    {cartItems.map((item, i) => (
+                      <div key={i} className="cart-item">
+                        <img src={item.image} alt={item.name} />
+                        <div className="cart-item-info">
+                          <p className="cart-item-name">{item.name}</p>
+                          <p className="cart-item-size">Size: UK {item.size}</p>
+                          <p className="cart-item-qty">Qty: {item.qty}</p>
+                          <p className="cart-item-price">₹ {(item.price * item.qty).toLocaleString('en-IN')}</p>
+                        </div>
+                        <button className="remove-btn" onClick={() => onRemoveFromCart(item.id, item.size)}>
+                          <Trash2 size={16} />
+                        </button>
                       </div>
-                      <button className="remove-btn" onClick={() => onRemoveFromCart(item.id, item.size)}>
-                        <Trash2 size={16} />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-                <div className="cart-footer">
-                  <div className="cart-total">
-                    <span>Total</span>
-                    <span>₹ {cartTotal.toLocaleString('en-IN')}</span>
+                    ))}
                   </div>
-                  <button className="btn-primary checkout-btn" onClick={() => {
-                    if (!loggedInUser) {
-                      onClose();
-                      setTimeout(() => onSwitchOverlay('login'), 100);
-                    } else {
-                      onCheckout();
-                    }
-                  }}>PROCEED TO CHECKOUT</button>
-                </div>
+                  <div className="cart-footer">
+                    <div className="cart-total">
+                      <span>Total</span>
+                      <span>₹ {cartTotal.toLocaleString('en-IN')}</span>
+                    </div>
+                    <button className="btn-primary checkout-btn" onClick={() => {
+                      if (!loggedInUser) {
+                        onClose();
+                        setTimeout(() => onSwitchOverlay('login'), 100);
+                      } else {
+                        onCheckout();
+                      }
+                    }}>PROCEED TO CHECKOUT</button>
+                  </div>
                 </>
               )
             ) : (
@@ -391,12 +363,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
           </div>
         </motion.div>
       ) : (
-        <motion.div
-          className="modal"
-          initial={{ opacity: 0, scale: 0.9, y: 20 }}
-          animate={{ opacity: 1, scale: 1, y: 0 }}
-          exit={{ opacity: 0, scale: 0.9, y: 20 }}
-        >
+        <motion.div className="modal" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}>
           <div className="modal-header">
             <button className="close-btn" onClick={onClose}><X size={24} /></button>
           </div>
@@ -406,10 +373,10 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
             <p>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</p>
 
             <div className="auth-form">
-              {isSignUp && <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />}
-              <input type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
-              <input type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
-              {isSignUp && <input type="password" placeholder="Confirm Password" value={formData.confirm} onChange={e => setFormData({...formData, confirm: e.target.value})} />}
+              {isSignUp && <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />}
+              <input type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
+              <input type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({ ...formData, password: e.target.value })} />
+              {isSignUp && <input type="password" placeholder="Confirm Password" value={formData.confirm} onChange={e => setFormData({ ...formData, confirm: e.target.value })} />}
               {error && <p className="auth-error">{error}</p>}
               <button className="btn-primary auth-btn" onClick={handleAuth}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
               <div className="separator"><span>OR CONTINUE WITH</span></div>
@@ -430,4 +397,4 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
   );
 };
 
-export default App
+export default App;
