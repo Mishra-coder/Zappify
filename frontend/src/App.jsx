@@ -116,9 +116,11 @@ function App() {
     });
   }, [selectedCategories, selectedThemes, sneakersView, searchQuery]);
 
+  const isEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
+
   return (
     <div className="zappify-app">
-      <Header
+      {!isEmbed && <Header
         onOpenOverlay={setActiveOverlay}
         onNavigate={handleNavigate}
         cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
@@ -128,7 +130,7 @@ function App() {
         onOpenAccount={() => setShowAccount(true)}
         searchQuery={searchQuery}
         onSearch={setSearchQuery}
-      />
+      />}
 
       <main className="app-main">
         <div className="container-broad main-layout">
