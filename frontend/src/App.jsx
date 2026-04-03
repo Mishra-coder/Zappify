@@ -194,7 +194,13 @@ function App() {
           onClose={() => setShowCheckout(false)}
           onRemoveFromCart={removeFromCart}
           onOrderPlaced={(items) => {
-            const updated = [...placedOrders, ...items];
+            const newOrders = items.map(item => ({
+              ...item,
+              orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
+              placedAt: new Date().toISOString(),
+              status: 'Placed',
+            }));
+            const updated = [...placedOrders, ...newOrders];
             setPlacedOrders(updated);
             localStorage.setItem('zappify_orders', JSON.stringify(updated));
             setCartItems([]);
@@ -208,6 +214,11 @@ function App() {
           orders={placedOrders}
           onClose={() => setShowAccount(false)}
           onLogout={() => { handleLogout(); setShowAccount(false); }}
+          onCancelOrder={(orderId) => {
+            const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
+            setPlacedOrders(updated);
+            localStorage.setItem('zappify_orders', JSON.stringify(updated));
+          }}
         />
       )}
     </div>

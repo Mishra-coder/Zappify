@@ -7,7 +7,7 @@ export const ALL_PRODUCTS = [
     category: 'Men High Top Sneakers',
     theme: 'Cyber Sport',
     price: 3799,
-    image: '/shoes/shoe1.jpg',
+    image: '/shoes/shoe31.jpg',
     isTrending: true,
     description: 'Smash your limits with The Incredible Hulk High Tops. Featuring heavy-duty impact cushioning and gamma-green accents.'
   },
