@@ -15,6 +15,8 @@ function App() {
   const [cartItems, setCartItems] = useState([]);
   const [wishlistItems, setWishlistItems] = useState([]);
   const [sortOption, setSortOption] = useState('recommended');
+  const [activeNav, setActiveNav] = useState('MEN');
+  const [sneakersView, setSneakersView] = useState(false);
 
   const toggleFilter = (item, type) => {
     if (type === 'category') {
@@ -28,14 +30,10 @@ function App() {
     }
   };
 
-  const [activeNav, setActiveNav] = useState('MEN');
-
-  const [sneakersView, setSneakersView] = useState(false);
-
   const handleNavigate = (destination) => {
     setSelectedProduct(null);
-    setSelectedThemes([]);
     setSelectedCategories([]);
+    setSelectedThemes([]);
     if (destination === 'SNEAKERS') {
       setSneakersView(true);
     } else {
@@ -160,7 +158,6 @@ function App() {
             wishlistItems={wishlistItems}
             onRemoveFromCart={removeFromCart}
             onToggleWishlist={toggleWishlist}
-            onSwitchOverlay={setActiveOverlay}
           />
         )}
       </AnimatePresence>
@@ -168,7 +165,7 @@ function App() {
   )
 }
 
-const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onSwitchOverlay }) => {
+const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const isDrawer = type === 'cart' || type === 'wishlist';
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
@@ -213,7 +210,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                         <p className="cart-item-name">{item.name}</p>
                         <p className="cart-item-size">Size: UK {item.size}</p>
                         <p className="cart-item-qty">Qty: {item.qty}</p>
-                        <p className="cart-item-price">₹ {item.price * item.qty}</p>
+                        <p className="cart-item-price">₹ {(item.price * item.qty).toLocaleString('en-IN')}</p>
                       </div>
                       <button className="remove-btn" onClick={() => onRemoveFromCart(item.id, item.size)}>
                         <Trash2 size={16} />
@@ -222,7 +219,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                   ))}
                   <div className="cart-total">
                     <span>Total</span>
-                    <span>₹ {cartTotal}</span>
+                    <span>₹ {cartTotal.toLocaleString('en-IN')}</span>
                   </div>
                   <button className="btn-primary checkout-btn">PROCEED TO CHECKOUT</button>
                 </div>
@@ -241,7 +238,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                       <img src={item.image} alt={item.name} />
                       <div className="cart-item-info">
                         <p className="cart-item-name">{item.name}</p>
-                        <p className="cart-item-price">₹ {item.price}</p>
+                        <p className="cart-item-price">₹ {item.price.toLocaleString('en-IN')}</p>
                       </div>
                       <button className="remove-btn" onClick={() => onToggleWishlist(item)}>
                         <Trash2 size={16} />
