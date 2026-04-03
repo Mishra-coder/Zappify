@@ -3,14 +3,22 @@ import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvo
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { GoogleSignin, statusCodes } from '@react-native-google-signin/google-signin';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
-GoogleSignin.configure({
-  webClientId: '1076957044730-mht8sbihb0d4661hprrvbjf9v4gb0njr.apps.googleusercontent.com',
-  offlineAccess: true,
-});
+let GoogleSignin, statusCodes;
+try {
+  const gs = require('@react-native-google-signin/google-signin');
+  GoogleSignin = gs.GoogleSignin;
+  statusCodes = gs.statusCodes;
+  GoogleSignin.configure({
+    webClientId: '1076957044730-mht8sbihb0d4661hprrvbjf9v4gb0njr.apps.googleusercontent.com',
+    offlineAccess: true,
+  });
+} catch (e) {
+  GoogleSignin = null;
+  statusCodes = {};
+}
 
 export default function LoginScreen({ navigation }) {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -18,6 +26,10 @@ export default function LoginScreen({ navigation }) {
   const { login } = useApp();
 
   const handleGoogleSignIn = async () => {
+    if (!GoogleSignin) {
+      Alert.alert('Not Available', 'Google Sign In is only available in the production build.');
+      return;
+    }
     try {
       await GoogleSignin.hasPlayServices();
       const userInfo = await GoogleSignin.signIn();
