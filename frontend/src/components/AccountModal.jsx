@@ -141,8 +141,10 @@ const AccountModal = ({ user, onClose, onLogout, orders, onCancelOrder }) => {
                 <div className="od-tracking">
                   {TRACKING_STEPS.map((step, i) => (
                     <div key={step} className="track-step">
-                      <div className={`track-dot ${i === 0 ? 'active' : ''}`} />
-                      {i < TRACKING_STEPS.length - 1 && <div className="track-line" />}
+                      <div className="track-left">
+                        <div className={`track-dot ${i === 0 ? 'active' : ''}`} />
+                        {i < TRACKING_STEPS.length - 1 && <div className="track-line" />}
+                      </div>
                       <div className="track-info">
                         <p className={`track-label ${i === 0 ? 'active' : ''}`}>{step}</p>
                         {i === 0 && <p className="track-date">{formatDate(selectedOrder.placedAt)}</p>}
