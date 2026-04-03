@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
@@ -16,15 +17,10 @@ export default function LoginScreen({ navigation }) {
       if (!form.name) { Alert.alert('Error', 'Please enter your name'); return; }
       if (form.password !== form.confirm) { Alert.alert('Error', 'Passwords do not match'); return; }
       if (form.password.length < 6) { Alert.alert('Error', 'Password must be at least 6 characters'); return; }
-      const user = {
-        name: form.name,
-        email: form.email,
-        picture: null,
-      };
+      const user = { name: form.name, email: form.email, picture: null };
       await login(user);
       navigation.goBack();
     } else {
-      const { AsyncStorage } = require('@react-native-async-storage/async-storage');
       const saved = await AsyncStorage.getItem('zappify_user');
       if (saved) {
         const u = JSON.parse(saved);
@@ -45,46 +41,18 @@ export default function LoginScreen({ navigation }) {
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
         <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
           <View style={styles.iconWrap}>
-            <User size={40} color={colors.brand} />
+            <Ionicons name="person-outline" size={40} color={colors.brand} />
           </View>
           <Text style={styles.heading}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
           <Text style={styles.sub}>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</Text>
 
           {isSignUp && (
-            <TextInput
-              style={styles.input}
-              placeholder="Full Name"
-              placeholderTextColor={colors.gray}
-              value={form.name}
-              onChangeText={v => setForm({ ...form, name: v })}
-            />
+            <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor={colors.gray} value={form.name} onChangeText={v => setForm({ ...form, name: v })} />
           )}
-          <TextInput
-            style={styles.input}
-            placeholder="Email Address"
-            placeholderTextColor={colors.gray}
-            value={form.email}
-            onChangeText={v => setForm({ ...form, email: v })}
-            keyboardType="email-address"
-            autoCapitalize="none"
-          />
-          <TextInput
-            style={styles.input}
-            placeholder="Password"
-            placeholderTextColor={colors.gray}
-            value={form.password}
-            onChangeText={v => setForm({ ...form, password: v })}
-            secureTextEntry
-          />
+          <TextInput style={styles.input} placeholder="Email Address" placeholderTextColor={colors.gray} value={form.email} onChangeText={v => setForm({ ...form, email: v })} keyboardType="email-address" autoCapitalize="none" />
+          <TextInput style={styles.input} placeholder="Password" placeholderTextColor={colors.gray} value={form.password} onChangeText={v => setForm({ ...form, password: v })} secureTextEntry />
           {isSignUp && (
-            <TextInput
-              style={styles.input}
-              placeholder="Confirm Password"
-              placeholderTextColor={colors.gray}
-              value={form.confirm}
-              onChangeText={v => setForm({ ...form, confirm: v })}
-              secureTextEntry
-            />
+            <TextInput style={styles.input} placeholder="Confirm Password" placeholderTextColor={colors.gray} value={form.confirm} onChangeText={v => setForm({ ...form, confirm: v })} secureTextEntry />
           )}
 
           <TouchableOpacity style={styles.authBtn} onPress={handleAuth}>

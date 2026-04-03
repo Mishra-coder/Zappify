@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, Modal, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { ArrowLeft, Heart, ShoppingBag, ShieldCheck, RotateCcw, X } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
@@ -14,7 +14,6 @@ const SIZE_CHART = [
   { uk: '10', us: '11', eu: '43', cm: '27.5' },
   { uk: '11', us: '12', eu: '44', cm: '28.5' },
 ];
-
 const W = Dimensions.get('window').width;
 
 export default function ProductDetailScreen({ route, navigation }) {
@@ -34,7 +33,7 @@ export default function ProductDetailScreen({ route, navigation }) {
     <SafeAreaView style={styles.safe}>
       <View style={styles.topBar}>
         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backBtn}>
-          <ArrowLeft size={22} color={colors.dark} />
+          <Ionicons name="arrow-back" size={22} color={colors.dark} />
         </TouchableOpacity>
         <Text style={styles.topTitle} numberOfLines={1}>{product.name}</Text>
         <View style={{ width: 36 }} />
@@ -42,13 +41,11 @@ export default function ProductDetailScreen({ route, navigation }) {
 
       <ScrollView showsVerticalScrollIndicator={false}>
         <Image source={{ uri: product.image }} style={styles.image} resizeMode="cover" />
-
         <View style={styles.body}>
           <Text style={styles.brand}>{product.brand}</Text>
           <Text style={styles.name}>{product.name}</Text>
           <Text style={styles.category}>{product.category}</Text>
           <Text style={styles.price}>₹ {product.price.toLocaleString('en-IN')}</Text>
-
           <Text style={styles.desc}>{product.description}</Text>
 
           <View style={styles.sizeHeader}>
@@ -71,8 +68,8 @@ export default function ProductDetailScreen({ route, navigation }) {
           </View>
 
           <View style={styles.badges}>
-            <View style={styles.badgeItem}><ShieldCheck size={16} color={colors.brand} /><Text style={styles.badgeTxt}>100% Authentic</Text></View>
-            <View style={styles.badgeItem}><RotateCcw size={16} color={colors.brand} /><Text style={styles.badgeTxt}>30-Day Returns</Text></View>
+            <View style={styles.badgeItem}><Ionicons name="shield-checkmark-outline" size={16} color={colors.brand} /><Text style={styles.badgeTxt}>100% Authentic</Text></View>
+            <View style={styles.badgeItem}><Ionicons name="refresh-outline" size={16} color={colors.brand} /><Text style={styles.badgeTxt}>30-Day Returns</Text></View>
           </View>
         </View>
       </ScrollView>
@@ -82,10 +79,10 @@ export default function ProductDetailScreen({ route, navigation }) {
           style={[styles.wishlistBtn, wishlisted && styles.wishlistBtnActive]}
           onPress={() => toggleWishlist(product)}
         >
-          <Heart size={20} color={wishlisted ? colors.brand : colors.gray} fill={wishlisted ? colors.brand : 'none'} />
+          <Ionicons name={wishlisted ? 'heart' : 'heart-outline'} size={22} color={wishlisted ? colors.brand : colors.gray} />
         </TouchableOpacity>
         <TouchableOpacity style={styles.cartBtn} onPress={handleAddToCart}>
-          <ShoppingBag size={18} color={colors.white} />
+          <Ionicons name="bag-outline" size={18} color={colors.white} />
           <Text style={styles.cartBtnTxt}>ADD TO CART</Text>
         </TouchableOpacity>
       </View>
@@ -95,7 +92,9 @@ export default function ProductDetailScreen({ route, navigation }) {
           <View style={styles.modalBox}>
             <View style={styles.modalHeader}>
               <Text style={styles.modalTitle}>UK SIZE CHART</Text>
-              <TouchableOpacity onPress={() => setShowChart(false)}><X size={20} color={colors.gray} /></TouchableOpacity>
+              <TouchableOpacity onPress={() => setShowChart(false)}>
+                <Ionicons name="close" size={20} color={colors.gray} />
+              </TouchableOpacity>
             </View>
             <View style={styles.tableHeader}>
               {['UK', 'US', 'EU', 'CM'].map(h => <Text key={h} style={styles.tableHead}>{h}</Text>)}

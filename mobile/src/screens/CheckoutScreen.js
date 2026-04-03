@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Check, ChevronRight } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
@@ -29,7 +29,7 @@ export default function CheckoutScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.successBox}>
-          <View style={styles.successIcon}><Check size={36} color={colors.white} /></View>
+          <View style={styles.successIcon}><Ionicons name="checkmark" size={36} color={colors.white} /></View>
           <Text style={styles.successTitle}>Order Placed!</Text>
           <Text style={styles.successMsg}>Your order has been placed successfully. You'll receive a confirmation soon.</Text>
           <TouchableOpacity style={styles.continueBtn} onPress={() => navigation.navigate('Home')}>
@@ -52,7 +52,7 @@ export default function CheckoutScreen({ navigation }) {
             <View style={styles.stepItem}>
               <View style={[styles.stepCircle, i <= step && styles.stepCircleActive, i < step && styles.stepCircleDone]}>
                 {i < step
-                  ? <Check size={12} color={colors.white} />
+                  ? <Ionicons name="checkmark" size={12} color={colors.white} />
                   : <Text style={[styles.stepNum, i <= step && styles.stepNumActive]}>{i + 1}</Text>
                 }
               </View>
@@ -64,7 +64,6 @@ export default function CheckoutScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.body} showsVerticalScrollIndicator={false}>
-
         {step === 0 && (
           <View>
             {cartItems.map((item, i) => (
@@ -83,7 +82,7 @@ export default function CheckoutScreen({ navigation }) {
             </View>
             <TouchableOpacity style={styles.nextBtn} onPress={() => setStep(1)}>
               <Text style={styles.nextTxt}>PROCEED TO ADDRESS</Text>
-              <ChevronRight size={18} color={colors.white} />
+              <Ionicons name="chevron-forward" size={18} color={colors.white} />
             </TouchableOpacity>
           </View>
         )}
@@ -110,7 +109,7 @@ export default function CheckoutScreen({ navigation }) {
                 setStep(2);
               }}>
                 <Text style={styles.nextTxt}>PROCEED TO PAYMENT</Text>
-                <ChevronRight size={18} color={colors.white} />
+                <Ionicons name="chevron-forward" size={18} color={colors.white} />
               </TouchableOpacity>
             </View>
           </View>
@@ -120,11 +119,7 @@ export default function CheckoutScreen({ navigation }) {
           <View>
             <Text style={styles.sectionTitle}>PAYMENT METHOD</Text>
             {PAYMENT_OPTIONS.map(opt => (
-              <TouchableOpacity
-                key={opt.id}
-                style={[styles.payOption, payment === opt.id && styles.payOptionActive]}
-                onPress={() => setPayment(opt.id)}
-              >
+              <TouchableOpacity key={opt.id} style={[styles.payOption, payment === opt.id && styles.payOptionActive]} onPress={() => setPayment(opt.id)}>
                 <View style={[styles.radio, payment === opt.id && styles.radioActive]}>
                   {payment === opt.id && <View style={styles.radioDot} />}
                 </View>
@@ -142,7 +137,6 @@ export default function CheckoutScreen({ navigation }) {
             </View>
           </View>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );

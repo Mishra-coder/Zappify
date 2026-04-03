@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { User, Package, LogOut, ArrowLeft, ChevronRight, Check } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
 const TRACKING = ['Order Placed', 'Shipped', 'In-Transit', 'Out For Delivery', 'Delivered'];
 const CANCEL_REASONS = ['Changed my mind', 'Ordered by mistake', 'Found a better price elsewhere', 'Delivery time is too long', 'Other'];
-
 const formatDate = (str) => new Date(str).toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
 const estDelivery = (str) => { const d = new Date(str); d.setDate(d.getDate() + 7); return d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' }); };
 
@@ -22,7 +21,7 @@ export default function AccountScreen({ navigation }) {
     return (
       <SafeAreaView style={styles.safe}>
         <View style={styles.guestBox}>
-          <User size={56} color={colors.border} />
+          <Ionicons name="person-outline" size={56} color={colors.border} />
           <Text style={styles.guestTitle}>You're not logged in</Text>
           <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
             <Text style={styles.loginBtnTxt}>LOGIN / SIGN UP</Text>
@@ -50,7 +49,7 @@ export default function AccountScreen({ navigation }) {
       <View style={styles.topBar}>
         {view !== 'main' && (
           <TouchableOpacity onPress={() => setView(view === 'cancel' ? 'detail' : 'main')} style={styles.backBtn}>
-            <ArrowLeft size={20} color={colors.dark} />
+            <Ionicons name="arrow-back" size={20} color={colors.dark} />
           </TouchableOpacity>
         )}
         <Text style={styles.title}>
@@ -60,7 +59,6 @@ export default function AccountScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.body}>
-
         {view === 'main' && (
           <>
             <View style={styles.profileCard}>
@@ -76,11 +74,11 @@ export default function AccountScreen({ navigation }) {
               </View>
             </View>
 
-            <Text style={styles.sectionTitle}><Package size={14} color={colors.gray} /> MY ORDERS</Text>
+            <Text style={styles.sectionTitle}>MY ORDERS</Text>
 
             {orders.length === 0 ? (
               <View style={styles.emptyOrders}>
-                <Package size={36} color={colors.border} />
+                <Ionicons name="bag-outline" size={36} color={colors.border} />
                 <Text style={styles.emptyTxt}>No orders yet</Text>
               </View>
             ) : (
@@ -96,14 +94,14 @@ export default function AccountScreen({ navigation }) {
                     <View style={[styles.statusBadge, order.status === 'Cancelled' && styles.statusCancelled]}>
                       <Text style={[styles.statusTxt, order.status === 'Cancelled' && styles.statusTxtCancelled]}>{order.status}</Text>
                     </View>
-                    <ChevronRight size={16} color={colors.gray} />
+                    <Ionicons name="chevron-forward" size={16} color={colors.gray} />
                   </View>
                 </TouchableOpacity>
               ))
             )}
 
-            <TouchableOpacity style={styles.logoutBtn} onPress={() => { logout(); }}>
-              <LogOut size={16} color={colors.gray} />
+            <TouchableOpacity style={styles.logoutBtn} onPress={logout}>
+              <Ionicons name="log-out-outline" size={16} color={colors.gray} />
               <Text style={styles.logoutTxt}>LOGOUT</Text>
             </TouchableOpacity>
           </>
@@ -153,9 +151,6 @@ export default function AccountScreen({ navigation }) {
 
         {view === 'cancel' && selectedOrder && (
           <>
-            <View style={styles.odHeader}>
-              <Text style={styles.odLabel}>Order ID: <Text style={styles.odVal}>{selectedOrder.orderId}</Text></Text>
-            </View>
             <Text style={styles.cancelHeading}>Reason for Cancellation</Text>
             <Text style={styles.cancelSub}>Please tell us the reason for cancellation.</Text>
             {CANCEL_REASONS.map(r => (
@@ -172,7 +167,6 @@ export default function AccountScreen({ navigation }) {
             </View>
           </>
         )}
-
       </ScrollView>
 
       <Modal visible={showConfirm} transparent animationType="fade">

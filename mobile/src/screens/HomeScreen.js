@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react';
 import { View, Text, FlatList, TextInput, TouchableOpacity, StyleSheet, StatusBar } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { ALL_PRODUCTS } from '../data/products';
 import { colors } from '../theme/colors';
 import ProductCard from '../components/ProductCard';
 import { useApp } from '../context/AppContext';
-import { ShoppingCart, Heart, User, Search, X } from 'lucide-react-native';
 
 const CATEGORIES = ['All', 'Men Low Top Sneakers', 'Men High Top Sneakers', 'Men Mid Top Sneakers', 'Men Clogs', 'Men Slip-ons'];
 
@@ -32,24 +32,24 @@ export default function HomeScreen({ navigation }) {
         <Text style={styles.logo}><Text style={styles.logoZ}>Z</Text>appify</Text>
         <View style={styles.headerActions}>
           <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('Wishlist')}>
-            <Heart size={22} color={colors.dark} />
+            <Ionicons name="heart-outline" size={22} color={colors.dark} />
             {wishlistItems.length > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{wishlistItems.length}</Text></View>}
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('Cart')}>
-            <ShoppingCart size={22} color={colors.dark} />
+            <Ionicons name="bag-outline" size={22} color={colors.dark} />
             {cartCount > 0 && <View style={styles.badge}><Text style={styles.badgeText}>{cartCount}</Text></View>}
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconBtn} onPress={() => navigation.navigate('Account')}>
-            {user?.picture
+            {user
               ? <View style={styles.avatarSmall}><Text style={{ fontSize: 12, fontWeight: '700', color: colors.white }}>{user.name[0]}</Text></View>
-              : <User size={22} color={colors.dark} />
+              : <Ionicons name="person-outline" size={22} color={colors.dark} />
             }
           </TouchableOpacity>
         </View>
       </View>
 
       <View style={styles.searchBar}>
-        <Search size={16} color={colors.gray} />
+        <Ionicons name="search-outline" size={16} color={colors.gray} />
         <TextInput
           style={styles.searchInput}
           placeholder="What are you looking for?"
@@ -57,7 +57,11 @@ export default function HomeScreen({ navigation }) {
           value={search}
           onChangeText={setSearch}
         />
-        {search.length > 0 && <TouchableOpacity onPress={() => setSearch('')}><X size={16} color={colors.gray} /></TouchableOpacity>}
+        {search.length > 0 && (
+          <TouchableOpacity onPress={() => setSearch('')}>
+            <Ionicons name="close" size={16} color={colors.gray} />
+          </TouchableOpacity>
+        )}
       </View>
 
       <FlatList

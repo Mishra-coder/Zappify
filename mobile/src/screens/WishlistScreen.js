@@ -1,11 +1,9 @@
 import React from 'react';
-import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Heart, Trash2 } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
-
-const W = Dimensions.get('window').width;
 
 export default function WishlistScreen({ navigation }) {
   const { wishlistItems, toggleWishlist } = useApp();
@@ -17,7 +15,7 @@ export default function WishlistScreen({ navigation }) {
           <Text style={styles.title}>MY WISHLIST</Text>
         </View>
         <View style={styles.empty}>
-          <Heart size={56} color={colors.border} />
+          <Ionicons name="heart-outline" size={56} color={colors.border} />
           <Text style={styles.emptyTitle}>Your wishlist is empty</Text>
           <TouchableOpacity style={styles.shopBtn} onPress={() => navigation.goBack()}>
             <Text style={styles.shopBtnTxt}>CONTINUE SHOPPING</Text>
@@ -33,17 +31,12 @@ export default function WishlistScreen({ navigation }) {
         <Text style={styles.title}>MY WISHLIST</Text>
         <Text style={styles.count}>{wishlistItems.length} item{wishlistItems.length > 1 ? 's' : ''}</Text>
       </View>
-
       <FlatList
         data={wishlistItems}
         keyExtractor={item => item.id.toString()}
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            style={styles.item}
-            onPress={() => navigation.navigate('ProductDetail', { product: item })}
-            activeOpacity={0.9}
-          >
+          <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProductDetail', { product: item })} activeOpacity={0.9}>
             <Image source={{ uri: item.image }} style={styles.itemImg} resizeMode="cover" />
             <View style={styles.itemInfo}>
               <Text style={styles.itemBrand}>{item.brand}</Text>
@@ -51,7 +44,7 @@ export default function WishlistScreen({ navigation }) {
               <Text style={styles.itemPrice}>₹ {item.price.toLocaleString('en-IN')}</Text>
             </View>
             <TouchableOpacity style={styles.removeBtn} onPress={() => toggleWishlist(item)}>
-              <Trash2 size={18} color={colors.gray} />
+              <Ionicons name="trash-outline" size={18} color={colors.gray} />
             </TouchableOpacity>
           </TouchableOpacity>
         )}

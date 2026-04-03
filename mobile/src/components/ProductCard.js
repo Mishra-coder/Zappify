@@ -1,6 +1,6 @@
 import React from 'react';
 import { View, Text, Image, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { Heart, TrendingUp } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
@@ -17,7 +17,7 @@ export default function ProductCard({ product, onPress }) {
         <Image source={{ uri: product.image }} style={styles.image} resizeMode="cover" />
         {product.isTrending && (
           <View style={styles.trendBadge}>
-            <TrendingUp size={10} color={colors.white} />
+            <Ionicons name="trending-up" size={10} color={colors.white} />
             <Text style={styles.trendText}>Trending</Text>
           </View>
         )}
@@ -25,7 +25,7 @@ export default function ProductCard({ product, onPress }) {
           style={[styles.wishBtn, wishlisted && styles.wishBtnActive]}
           onPress={() => toggleWishlist(product)}
         >
-          <Heart size={16} color={wishlisted ? colors.brand : colors.gray} fill={wishlisted ? colors.brand : 'none'} />
+          <Ionicons name={wishlisted ? 'heart' : 'heart-outline'} size={16} color={wishlisted ? colors.brand : colors.gray} />
         </TouchableOpacity>
       </View>
       <View style={styles.info}>

@@ -1,7 +1,7 @@
 import React from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Trash2, ShoppingBag } from 'lucide-react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 
@@ -21,7 +21,7 @@ export default function CartScreen({ navigation }) {
           <Text style={styles.title}>SHOPPING BAG</Text>
         </View>
         <View style={styles.empty}>
-          <ShoppingBag size={56} color={colors.border} />
+          <Ionicons name="bag-outline" size={56} color={colors.border} />
           <Text style={styles.emptyTitle}>Your bag is empty</Text>
           <TouchableOpacity style={styles.shopBtn} onPress={() => navigation.goBack()}>
             <Text style={styles.shopBtnTxt}>CONTINUE SHOPPING</Text>
@@ -51,7 +51,7 @@ export default function CartScreen({ navigation }) {
               <Text style={styles.itemPrice}>₹ {(item.price * item.qty).toLocaleString('en-IN')}</Text>
             </View>
             <TouchableOpacity style={styles.removeBtn} onPress={() => removeFromCart(item.id, item.size)}>
-              <Trash2 size={16} color={colors.gray} />
+              <Ionicons name="trash-outline" size={18} color={colors.gray} />
             </TouchableOpacity>
           </View>
         )}
