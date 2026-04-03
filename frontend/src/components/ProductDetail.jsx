@@ -2,9 +2,18 @@ import React, { useState } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, ShoppingBag, Heart, Share2, ShieldCheck } from 'lucide-react';
 
-const ProductDetail = ({ product, onBack }) => {
+const ProductDetail = ({ product, onBack, onAddToCart, onToggleWishlist, isWishlisted }) => {
   const [selectedSize, setSelectedSize] = useState(null);
   const sizes = ['7', '8', '9', '10', '11'];
+
+  const handleAddToCart = () => {
+    if (!selectedSize) {
+      alert('Please select a size first');
+      return;
+    }
+    onAddToCart(product, selectedSize);
+    alert(`${product.name} (UK ${selectedSize}) added to cart!`);
+  };
 
   return (
     <div className="product-detail-container">
@@ -14,9 +23,9 @@ const ProductDetail = ({ product, onBack }) => {
 
       <div className="detail-grid">
         <div className="image-display">
-          <motion.img 
-            src={product.image} 
-            alt={product.name} 
+          <motion.img
+            src={product.image}
+            alt={product.name}
             initial={{ scale: 0.9, opacity: 0 }}
             animate={{ scale: 1, opacity: 1 }}
             transition={{ duration: 0.5 }}
@@ -27,11 +36,11 @@ const ProductDetail = ({ product, onBack }) => {
           <span className="brand-tag">{product.brand}</span>
           <h1 className="product-title">{product.name}</h1>
           <p className="product-cat">{product.category}</p>
-          
-          <div className="price-tag">₹ {product.price}</div>
-          
+
+          <div className="price-tag">₹ {product.price.toLocaleString('en-IN')}</div>
+
           <div className="description-box">
-             <p>{product.description}</p>
+            <p>{product.description}</p>
           </div>
 
           <div className="size-selection">
@@ -41,7 +50,7 @@ const ProductDetail = ({ product, onBack }) => {
             </div>
             <div className="sizes-grid">
               {sizes.map(size => (
-                <button 
+                <button
                   key={size}
                   className={`size-btn ${selectedSize === size ? 'active' : ''}`}
                   onClick={() => setSelectedSize(size)}
@@ -53,11 +62,15 @@ const ProductDetail = ({ product, onBack }) => {
           </div>
 
           <div className="action-buttons">
-            <button className="add-to-cart-btn btn-primary" onClick={() => alert('Added to cart!')}>
+            <button className="add-to-cart-btn btn-primary" onClick={handleAddToCart}>
               <ShoppingBag size={20} /> ADD TO CART
             </button>
-            <button className="wishlist-btn-large">
-              <Heart size={20} /> WISHLIST
+            <button
+              className={`wishlist-btn-large ${isWishlisted ? 'wishlisted' : ''}`}
+              onClick={() => onToggleWishlist(product)}
+            >
+              <Heart size={20} fill={isWishlisted ? 'currentColor' : 'none'} />
+              {isWishlisted ? 'WISHLISTED' : 'WISHLIST'}
             </button>
           </div>
 
@@ -67,8 +80,7 @@ const ProductDetail = ({ product, onBack }) => {
           </div>
         </div>
       </div>
-
-      </div>
+    </div>
   );
 };
 

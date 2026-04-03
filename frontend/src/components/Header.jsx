@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
 
-const Header = ({ onOpenOverlay, onNavigate }) => {
+const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -10,7 +10,7 @@ const Header = ({ onOpenOverlay, onNavigate }) => {
       <nav className="container-broad">
         <div className="header-wrapper">
           <div className="logo-section">
-            <button 
+            <button
               className="mobile-toggle"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
@@ -23,16 +23,16 @@ const Header = ({ onOpenOverlay, onNavigate }) => {
 
           <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
             <li>
-              <button 
-                className="nav-item active" 
+              <button
+                className={`nav-item ${activeNav === 'MEN' ? 'active' : ''}`}
                 onClick={() => { onNavigate('MEN'); setIsMobileMenuOpen(false); }}
               >
                 MEN
               </button>
             </li>
             <li>
-              <button 
-                className="nav-item" 
+              <button
+                className={`nav-item ${activeNav === 'SNEAKERS' ? 'active' : ''}`}
                 onClick={() => { onNavigate('SNEAKERS'); setIsMobileMenuOpen(false); }}
               >
                 SNEAKERS
@@ -42,8 +42,8 @@ const Header = ({ onOpenOverlay, onNavigate }) => {
 
           <div className={`search-container ${isSearchFocused ? 'focused' : ''}`}>
             <Search className="search-icon" size={18} />
-            <input 
-              type="text" 
+            <input
+              type="text"
               placeholder="What are you looking for?"
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
@@ -56,16 +56,16 @@ const Header = ({ onOpenOverlay, onNavigate }) => {
             </button>
             <button className="action-btn" title="Wishlist" onClick={() => onOpenOverlay('wishlist')}>
               <Heart size={22} />
-              <span className="badge">0</span>
+              {wishlistCount > 0 && <span className="badge">{wishlistCount}</span>}
             </button>
             <button className="action-btn cart-btn" title="Cart" onClick={() => onOpenOverlay('cart')}>
               <ShoppingCart size={22} />
+              {cartCount > 0 && <span className="badge">{cartCount}</span>}
             </button>
           </div>
         </div>
       </nav>
-
-      </header>
+    </header>
   );
 };
 

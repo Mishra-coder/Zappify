@@ -1,4 +1,5 @@
 # Zappify Shoes
+<<<<<<< Updated upstream
 **Zappify Shoes** is an online shoe store built to sell just *one* premium pair of shoes. Instead of a messy website with hundreds of products, Zappify gives the user a super clean and focused shopping experience for that single product.
 
 ### Simple Breakdown of What It Does:
@@ -8,6 +9,17 @@
 - **Powerful Engine (Backend):** Behind the scenes, it uses a real database to safely store user data and orders. It's built on popular, modern technologies (React for what you see, Node.js and MongoDB for what happens behind the scenes).
 
 In simple words, Zappify is a complete, real-world example of an e-commerce website designed to look great and work perfectly from start to checkout.
+=======
+Zappify Shoes is a highly-optimized, premium e-commerce platform dedicated to showcasing and selling a single, flagship shoe model. Rather than overwhelming users with endless product catalogs, Zappify provides a focused, immersive shopping experience.
+
+### What It Does
+- **Immersive Showcase:** Presents the product using smooth, performant animations and a sleek UI built with React and Framer Motion.
+- **Secure Shopping:** Users can securely sign up, log in, and manage their sessions via a robust JWT-based authentication system.
+- **Order Processing:** Includes backend capabilities for securely capturing user orders, managing cart data, and processing shipping details via a REST API.
+- **Scalable Architecture:** Powered by a robust Node.js/Express backend and MongoDB Atlas, offering a complete, production-ready full-stack (MERN) environment containerized with Docker.
+
+Designed for both performance enthusiasts and modern shoe lovers, Zappify ensures a beautiful, secure, and seamless user journey from the landing page to checkout.
+>>>>>>> Stashed changes
 
 ## Key Features
 
