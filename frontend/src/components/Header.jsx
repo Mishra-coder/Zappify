@@ -1,12 +1,47 @@
+import { useState } from 'react';
 import { Search, ShoppingBag, Heart, User, X } from 'lucide-react';
 
-const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, loggedInUser, onOpenAccount, searchQuery, onSearch }) => {
+const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav, loggedInUser, onOpenAccount, searchQuery, onSearch }) => {
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
   return (
-    <header className="sticky-header glass">
+    <header className="sticky-header">
       <nav className="container-broad">
         <div className="header-wrapper">
           <div className="brand-logo" onClick={() => onNavigate('home')} style={{ cursor: 'pointer' }}>
             <span className="logo-accent">Z</span>appify
+          </div>
+
+          <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
+            <li>
+              <button
+                className={`nav-item ${activeNav === 'MEN' ? 'active' : ''}`}
+                onClick={() => { onNavigate('MEN'); setIsMobileMenuOpen(false); }}
+              >
+                MEN
+              </button>
+            </li>
+            <li>
+              <button
+                className={`nav-item ${activeNav === 'SNEAKERS' ? 'active' : ''}`}
+                onClick={() => { onNavigate('SNEAKERS'); setIsMobileMenuOpen(false); }}
+              >
+                SNEAKERS
+              </button>
+            </li>
+          </ul>
+
+          <div className="search-container">
+            <Search className="search-icon" size={18} />
+            <input
+              type="text"
+              placeholder="What are you looking for?"
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
+            />
+            {searchQuery && (
+              <button className="search-clear" onClick={() => onSearch('')}><X size={16} /></button>
+            )}
           </div>
 
           <div className="user-actions">
@@ -34,19 +69,6 @@ const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, loggedInU
               </button>
             )}
           </div>
-        </div>
-
-        <div className="header-search">
-          <Search className="search-icon" size={18} />
-          <input
-            type="text"
-            placeholder="What are you looking for?"
-            value={searchQuery}
-            onChange={(e) => onSearch(e.target.value)}
-          />
-          {searchQuery && (
-            <button className="search-clear" onClick={() => onSearch('')}><X size={16} /></button>
-          )}
         </div>
       </nav>
     </header>

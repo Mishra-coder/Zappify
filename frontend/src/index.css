@@ -291,7 +291,10 @@ ul {
           position: sticky;
           top: 0;
           z-index: 1000;
-          background: var(--white);
+          background: #ffffff;
+          height: 80px;
+          display: flex;
+          align-items: center;
           border-bottom: 1px solid var(--slate-100);
           transition: var(--transition-smooth);
         }
@@ -300,42 +303,52 @@ ul {
           display: flex;
           align-items: center;
           justify-content: space-between;
-          padding: 16px 0 8px;
+          gap: 2rem;
         }
 
         .brand-logo {
           font-family: 'Outfit', sans-serif;
-          font-size: 1.8rem;
-          font-weight: 900;
+          font-size: 2.2rem;
+          font-weight: 800;
           color: var(--deep-slate);
-          letter-spacing: -1px;
+          letter-spacing: -1.5px;
         }
 
         .logo-accent {
           color: var(--brand-red);
         }
 
-        .header-search {
+        .nav-links {
           display: flex;
-          align-items: center;
-          gap: 10px;
-          background: var(--slate-100);
-          border-radius: 14px;
-          padding: 10px 16px;
-          margin-bottom: 12px;
+          gap: 2.5rem;
+          list-style: none;
         }
 
-        .header-search input {
-          flex: 1;
+        .nav-item {
+          font-size: 1rem;
+          font-weight: 700;
+          color: var(--slate-600);
+          position: relative;
+          padding: 0.5rem 0;
+          letter-spacing: 0.5px;
+          background: none;
           border: none;
-          background: transparent;
-          font-size: 14px;
-          color: var(--deep-slate);
-          outline: none;
+          cursor: pointer;
+          transition: 0.3s;
         }
 
-        .header-search input::placeholder {
-          color: var(--slate-400);
+        .nav-item.active {
+          color: var(--brand-red);
+        }
+
+        .nav-item.active::after {
+          content: '';
+          position: absolute;
+          bottom: 0;
+          left: 0;
+          width: 100%;
+          height: 3px;
+          background: var(--brand-red);
         }
 
         .search-container {

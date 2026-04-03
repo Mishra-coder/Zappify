@@ -1,5 +1,6 @@
 import { useState, useMemo } from 'react'
 import Header from './components/Header'
+import Sidebar from './components/Sidebar'
 import ProductGrid from './components/ProductGrid'
 import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
@@ -9,13 +10,13 @@ import { useGoogleLogin } from '@react-oauth/google'
 import Checkout from './components/Checkout'
 import AccountModal from './components/AccountModal'
 
-const CATEGORIES = ['All', 'Men Low Top Sneakers', 'Men High Top Sneakers', 'Men Mid Top Sneakers', 'Men Clogs', 'Men Slip-ons'];
-
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
+  const [selectedThemes, setSelectedThemes] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOverlay, setActiveOverlay] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeNav, setActiveNav] = useState('MEN');
   const [sneakersView, setSneakersView] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
@@ -55,10 +56,20 @@ function App() {
     setPlacedOrders([]);
   };
 
+  const toggleFilter = (item, type) => {
+    if (type === 'category') {
+      setSelectedCategories(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+    } else {
+      setSelectedThemes(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+    }
+  };
+
   const handleNavigate = (destination) => {
     setSelectedProduct(null);
     setSelectedCategories([]);
+    setSelectedThemes([]);
     setSneakersView(destination === 'SNEAKERS');
+    if (destination !== 'home') setActiveNav(destination);
   };
 
   const addToCart = (product, size) => {
@@ -96,13 +107,14 @@ function App() {
     return ALL_PRODUCTS.filter(product => {
       const sneakerMatch = sneakersView ? product.id >= 30 && product.id <= 44 : true;
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
+      const themeMatch = selectedThemes.length === 0 || selectedThemes.includes(product.theme);
       const searchMatch = searchQuery.trim() === '' ||
         product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
         product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return sneakerMatch && categoryMatch && searchMatch;
+      return sneakerMatch && categoryMatch && themeMatch && searchMatch;
     });
-  }, [selectedCategories, sneakersView, searchQuery]);
+  }, [selectedCategories, selectedThemes, sneakersView, searchQuery]);
 
   return (
     <div className="zappify-app">
@@ -111,6 +123,7 @@ function App() {
         onNavigate={handleNavigate}
         cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
         wishlistCount={wishlistItems.length}
+        activeNav={activeNav}
         loggedInUser={loggedInUser}
         onOpenAccount={() => setShowAccount(true)}
         searchQuery={searchQuery}
@@ -129,26 +142,19 @@ function App() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="category-chips">
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      className={`cat-chip ${selectedCategories.length === 0 && cat === 'All' ? 'active' : selectedCategories.includes(cat) ? 'active' : ''}`}
-                      onClick={() => cat === 'All'
-                        ? setSelectedCategories([])
-                        : setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
-                      }
-                    >
-                      {cat}
-                    </button>
-                  ))}
+                <div className="layout-split">
+                  <Sidebar
+                    selectedCategories={selectedCategories}
+                    selectedThemes={selectedThemes}
+                    onToggleFilter={toggleFilter}
+                  />
+                  <ProductGrid
+                    products={filteredProducts}
+                    onProductClick={setSelectedProduct}
+                    onToggleWishlist={toggleWishlist}
+                    isWishlisted={isWishlisted}
+                  />
                 </div>
-                <ProductGrid
-                  products={filteredProducts}
-                  onProductClick={setSelectedProduct}
-                  onToggleWishlist={toggleWishlist}
-                  isWishlisted={isWishlisted}
-                />
               </motion.div>
             ) : (
               <motion.div
