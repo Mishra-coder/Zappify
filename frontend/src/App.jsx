@@ -134,8 +134,7 @@ function App() {
                 exit={{ opacity: 0, x: -20 }}
                 transition={{ duration: 0.3 }}
               >
-                <div className="layout-split">
-                  <Sidebar
+                <div className="layout-split">                  <Sidebar
                     selectedCategories={selectedCategories}
                     selectedThemes={selectedThemes}
                     onToggleFilter={toggleFilter}
@@ -148,8 +147,7 @@ function App() {
                     onToggleWishlist={toggleWishlist}
                     isWishlisted={isWishlisted}
                   />
-                </div>
-              </motion.div>
+                </div>              </motion.div>
             ) : (
               <motion.div
                 key="detail"
