@@ -15,8 +15,12 @@ function App() {
   const [selectedThemes, setSelectedThemes] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOverlay, setActiveOverlay] = useState(null);
-  const [cartItems, setCartItems] = useState([]);
-  const [wishlistItems, setWishlistItems] = useState([]);
+  const [cartItems, setCartItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_cart')) || []; } catch { return []; }
+  });
+  const [wishlistItems, setWishlistItems] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_wishlist')) || []; } catch { return []; }
+  });
   const [sortOption, setSortOption] = useState('recommended');
   const [activeNav, setActiveNav] = useState('MEN');
   const [sneakersView, setSneakersView] = useState(false);
@@ -78,23 +82,30 @@ function App() {
   const addToCart = (product, size) => {
     setCartItems(prev => {
       const exists = prev.find(i => i.id === product.id && i.size === size);
-      if (exists) {
-        return prev.map(i => i.id === product.id && i.size === size ? { ...i, qty: i.qty + 1 } : i);
-      }
-      return [...prev, { ...product, size, qty: 1 }];
+      const updated = exists
+        ? prev.map(i => i.id === product.id && i.size === size ? { ...i, qty: i.qty + 1 } : i)
+        : [...prev, { ...product, size, qty: 1 }];
+      localStorage.setItem('zappify_cart', JSON.stringify(updated));
+      return updated;
     });
   };
 
   const removeFromCart = (id, size) => {
-    setCartItems(prev => prev.filter(i => !(i.id === id && i.size === size)));
+    setCartItems(prev => {
+      const updated = prev.filter(i => !(i.id === id && i.size === size));
+      localStorage.setItem('zappify_cart', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const toggleWishlist = (product) => {
-    setWishlistItems(prev =>
-      prev.find(i => i.id === product.id)
+    setWishlistItems(prev => {
+      const updated = prev.find(i => i.id === product.id)
         ? prev.filter(i => i.id !== product.id)
-        : [...prev, product]
-    );
+        : [...prev, product];
+      localStorage.setItem('zappify_wishlist', JSON.stringify(updated));
+      return updated;
+    });
   };
 
   const isWishlisted = (id) => wishlistItems.some(i => i.id === id);
@@ -222,6 +233,7 @@ function App() {
             setPlacedOrders(updated);
             localStorage.setItem(getOrdersKey(loggedInUser), JSON.stringify(updated));
             setCartItems([]);
+            localStorage.removeItem('zappify_cart');
           }}
         />
       )}
