@@ -26,18 +26,29 @@ function App() {
   });
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+
+  const getOrdersKey = (user) => `zappify_orders_${user?.email || 'guest'}`;
+
   const [placedOrders, setPlacedOrders] = useState(() => {
-    try { return JSON.parse(localStorage.getItem('zappify_orders')) || []; } catch { return []; }
+    try {
+      const user = JSON.parse(localStorage.getItem('zappify_user'));
+      if (!user) return [];
+      return JSON.parse(localStorage.getItem(`zappify_orders_${user.email}`)) || [];
+    } catch { return []; }
   });
 
   const handleLogin = (user) => {
     setLoggedInUser(user);
     localStorage.setItem('zappify_user', JSON.stringify(user));
+    // Load this user's orders
+    const userOrders = JSON.parse(localStorage.getItem(`zappify_orders_${user.email}`)) || [];
+    setPlacedOrders(userOrders);
   };
 
   const handleLogout = () => {
     setLoggedInUser(null);
     localStorage.removeItem('zappify_user');
+    setPlacedOrders([]);
   };
 
   const toggleFilter = (item, type) => {
@@ -207,7 +218,7 @@ function App() {
             }));
             const updated = [...placedOrders, ...newOrders];
             setPlacedOrders(updated);
-            localStorage.setItem('zappify_orders', JSON.stringify(updated));
+            localStorage.setItem(getOrdersKey(loggedInUser), JSON.stringify(updated));
             setCartItems([]);
           }}
         />
@@ -222,7 +233,7 @@ function App() {
           onCancelOrder={(orderId) => {
             const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
             setPlacedOrders(updated);
-            localStorage.setItem('zappify_orders', JSON.stringify(updated));
+            localStorage.setItem(getOrdersKey(loggedInUser), JSON.stringify(updated));
           }}
         />
       )}
