@@ -7,6 +7,7 @@ import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
 import { GoogleLogin, googleLogout } from '@react-oauth/google'
+import Checkout from './components/Checkout'
 
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -19,6 +20,7 @@ function App() {
   const [activeNav, setActiveNav] = useState('MEN');
   const [sneakersView, setSneakersView] = useState(false);
   const [loggedInUser, setLoggedInUser] = useState(null);
+  const [showCheckout, setShowCheckout] = useState(false);
 
   const toggleFilter = (item, type) => {
     if (type === 'category') {
@@ -163,14 +165,23 @@ function App() {
             onRemoveFromCart={removeFromCart}
             onToggleWishlist={toggleWishlist}
             onLoginSuccess={setLoggedInUser}
+            onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
           />
         )}
       </AnimatePresence>
+
+      {showCheckout && (
+        <Checkout
+          cartItems={cartItems}
+          onClose={() => setShowCheckout(false)}
+          onRemoveFromCart={removeFromCart}
+        />
+      )}
     </div>
   )
 }
 
-const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess }) => {
+const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const isDrawer = type === 'cart' || type === 'wishlist';
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
@@ -229,7 +240,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
                     <span>Total</span>
                     <span>₹ {cartTotal.toLocaleString('en-IN')}</span>
                   </div>
-                  <button className="btn-primary checkout-btn">PROCEED TO CHECKOUT</button>
+                  <button className="btn-primary checkout-btn" onClick={onCheckout}>PROCEED TO CHECKOUT</button>
                 </div>
                 </>
               )
