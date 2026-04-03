@@ -20,6 +20,7 @@ function App() {
   const [sortOption, setSortOption] = useState('recommended');
   const [activeNav, setActiveNav] = useState('MEN');
   const [sneakersView, setSneakersView] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
   const [loggedInUser, setLoggedInUser] = useState(() => {
     try { return JSON.parse(localStorage.getItem('zappify_user')) || null; } catch { return null; }
   });
@@ -92,7 +93,11 @@ function App() {
       const sneakerMatch = sneakersView ? product.id >= 30 && product.id <= 44 : true;
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
       const themeMatch = selectedThemes.length === 0 || selectedThemes.includes(product.theme);
-      return sneakerMatch && categoryMatch && themeMatch;
+      const searchMatch = searchQuery.trim() === '' || 
+        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        product.category.toLowerCase().includes(searchQuery.toLowerCase());
+      return sneakerMatch && categoryMatch && themeMatch && searchMatch;
     });
 
     if (sortOption === 'low-high') result = [...result].sort((a, b) => a.price - b.price);
@@ -100,7 +105,7 @@ function App() {
     else if (sortOption === 'newest') result = [...result].sort((a, b) => b.id - a.id);
 
     return result;
-  }, [selectedCategories, selectedThemes, sortOption, sneakersView]);
+  }, [selectedCategories, selectedThemes, sortOption, sneakersView, searchQuery]);
 
   return (
     <div className="zappify-app">
@@ -113,6 +118,8 @@ function App() {
         loggedInUser={loggedInUser}
         onLogout={handleLogout}
         onOpenAccount={() => setShowAccount(true)}
+        searchQuery={searchQuery}
+        onSearch={setSearchQuery}
       />
 
       <main className="app-main">

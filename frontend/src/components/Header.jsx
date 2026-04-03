@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
 
-const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav, loggedInUser, onLogout, onOpenAccount }) => {
+const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav, loggedInUser, onLogout, onOpenAccount, searchQuery, onSearch }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [showUserMenu, setShowUserMenu] = useState(false);
@@ -46,9 +46,14 @@ const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav
             <input
               type="text"
               placeholder="What are you looking for?"
+              value={searchQuery}
+              onChange={(e) => onSearch(e.target.value)}
               onFocus={() => setIsSearchFocused(true)}
               onBlur={() => setIsSearchFocused(false)}
             />
+            {searchQuery && (
+              <button className="search-clear" onClick={() => onSearch('')}>✕</button>
+            )}
           </div>
 
           <div className="user-actions">
