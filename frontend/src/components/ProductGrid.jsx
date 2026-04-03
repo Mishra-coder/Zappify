@@ -1,28 +1,30 @@
 import React from 'react';
 import ProductCard from './ProductCard';
 
-const ProductGrid = ({ products, onProductClick }) => {
+const ProductGrid = ({ products, onProductClick, sortOption, onSortChange, onToggleWishlist, isWishlisted }) => {
   return (
     <div className="main-content">
       <div className="content-header">
-        <div className="breadcrumb">
-          Home / Men Footwear
-          <span className="count"> - {products.length} items</span>
-        </div>
-        
+        <div></div>
         <div className="sort-dropdown">
-          <select defaultValue="recommended">
+          <select value={sortOption} onChange={(e) => onSortChange(e.target.value)}>
             <option value="recommended">Select Sorting Options</option>
-            <option value="popular">Price: Low to High</option>
-            <option value="newest">Price: High to Low</option>
-            <option value="rating">New Arrivals</option>
+            <option value="low-high">Price: Low to High</option>
+            <option value="high-low">Price: High to Low</option>
+            <option value="newest">New Arrivals</option>
           </select>
         </div>
       </div>
 
       <div className="product-grid">
         {products.map((product) => (
-          <ProductCard key={product.id} product={product} onClick={onProductClick} />
+          <ProductCard
+            key={product.id}
+            product={product}
+            onClick={onProductClick}
+            onToggleWishlist={onToggleWishlist}
+            isWishlisted={isWishlisted(product.id)}
+          />
         ))}
       </div>
 
@@ -32,8 +34,7 @@ const ProductGrid = ({ products, onProductClick }) => {
           <p>Try adjusting your categories or themes.</p>
         </div>
       )}
-
-      </div>
+    </div>
   );
 };
 
