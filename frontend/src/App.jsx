@@ -6,8 +6,7 @@ import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
-import { GoogleLogin } from '@react-oauth/google'
-import { jwtDecode } from 'jwt-decode'
+import { GoogleLogin, googleLogout } from '@react-oauth/google'
 
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -281,7 +280,8 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               <div className="google-btn-wrap">
                 <GoogleLogin
                   onSuccess={(credentialResponse) => {
-                    const decoded = jwtDecode(credentialResponse.credential);
+                    const base64 = credentialResponse.credential.split('.')[1];
+                    const decoded = JSON.parse(atob(base64));
                     onLoginSuccess(decoded);
                     onClose();
                   }}
