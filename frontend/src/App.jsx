@@ -20,10 +20,24 @@ function App() {
   const [sortOption, setSortOption] = useState('recommended');
   const [activeNav, setActiveNav] = useState('MEN');
   const [sneakersView, setSneakersView] = useState(false);
-  const [loggedInUser, setLoggedInUser] = useState(null);
+  const [loggedInUser, setLoggedInUser] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_user')) || null; } catch { return null; }
+  });
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
-  const [placedOrders, setPlacedOrders] = useState([]);
+  const [placedOrders, setPlacedOrders] = useState(() => {
+    try { return JSON.parse(localStorage.getItem('zappify_orders')) || []; } catch { return []; }
+  });
+
+  const handleLogin = (user) => {
+    setLoggedInUser(user);
+    localStorage.setItem('zappify_user', JSON.stringify(user));
+  };
+
+  const handleLogout = () => {
+    setLoggedInUser(null);
+    localStorage.removeItem('zappify_user');
+  };
 
   const toggleFilter = (item, type) => {
     if (type === 'category') {
@@ -97,7 +111,7 @@ function App() {
         wishlistCount={wishlistItems.length}
         activeNav={activeNav}
         loggedInUser={loggedInUser}
-        onLogout={() => setLoggedInUser(null)}
+        onLogout={handleLogout}
         onOpenAccount={() => setShowAccount(true)}
       />
 
@@ -168,7 +182,7 @@ function App() {
             wishlistItems={wishlistItems}
             onRemoveFromCart={removeFromCart}
             onToggleWishlist={toggleWishlist}
-            onLoginSuccess={setLoggedInUser}
+            onLoginSuccess={handleLogin}
             onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
           />
         )}
@@ -179,7 +193,12 @@ function App() {
           cartItems={cartItems}
           onClose={() => setShowCheckout(false)}
           onRemoveFromCart={removeFromCart}
-          onOrderPlaced={(items) => setPlacedOrders(prev => [...prev, ...items])}
+          onOrderPlaced={(items) => {
+            const updated = [...placedOrders, ...items];
+            setPlacedOrders(updated);
+            localStorage.setItem('zappify_orders', JSON.stringify(updated));
+            setCartItems([]);
+          }}
         />
       )}
 
@@ -188,7 +207,7 @@ function App() {
           user={loggedInUser}
           orders={placedOrders}
           onClose={() => setShowAccount(false)}
-          onLogout={() => { setLoggedInUser(null); setShowAccount(false); }}
+          onLogout={() => { handleLogout(); setShowAccount(false); }}
         />
       )}
     </div>
@@ -197,8 +216,31 @@ function App() {
 
 const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout }) => {
   const [isSignUp, setIsSignUp] = useState(false);
+  const [formData, setFormData] = useState({ name: '', email: '', password: '', confirm: '' });
+  const [error, setError] = useState('');
   const isDrawer = type === 'cart' || type === 'wishlist';
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
+
+  const handleAuth = () => {
+    setError('');
+    if (!formData.email || !formData.password) { setError('Please fill all fields'); return; }
+    if (isSignUp) {
+      if (!formData.name) { setError('Please enter your name'); return; }
+      if (formData.password !== formData.confirm) { setError('Passwords do not match'); return; }
+      if (formData.password.length < 6) { setError('Password must be at least 6 characters'); return; }
+      const user = { name: formData.name, email: formData.email, picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=e85d04&color=fff` };
+      onLoginSuccess(user);
+      onClose();
+    } else {
+      const saved = JSON.parse(localStorage.getItem('zappify_user'));
+      if (saved && saved.email === formData.email) {
+        onLoginSuccess(saved);
+        onClose();
+      } else {
+        setError('Account not found. Please sign up first.');
+      }
+    }
+  };
 
   return (
     <div className="overlay-system">
@@ -300,11 +342,12 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
             <p>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</p>
 
             <div className="auth-form">
-              {isSignUp && <input type="text" placeholder="Full Name" />}
-              <input type="email" placeholder="Email Address" />
-              <input type="password" placeholder="Password" />
-              {isSignUp && <input type="password" placeholder="Confirm Password" />}
-              <button className="btn-primary auth-btn">{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
+              {isSignUp && <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} />}
+              <input type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData({...formData, email: e.target.value})} />
+              <input type="password" placeholder="Password" value={formData.password} onChange={e => setFormData({...formData, password: e.target.value})} />
+              {isSignUp && <input type="password" placeholder="Confirm Password" value={formData.confirm} onChange={e => setFormData({...formData, confirm: e.target.value})} />}
+              {error && <p className="auth-error">{error}</p>}
+              <button className="btn-primary auth-btn" onClick={handleAuth}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
               <div className="separator"><span>OR CONTINUE WITH</span></div>
               <div className="google-btn-wrap">
                 <GoogleLogin

@@ -1,9 +1,19 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, ShoppingBag, Heart, Share2, ShieldCheck } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, ShoppingBag, Heart, Share2, ShieldCheck, X } from 'lucide-react';
+
+const SIZE_CHART = [
+  { uk: '6', us: '7', eu: '39', cm: '24.5' },
+  { uk: '7', us: '8', eu: '40', cm: '25.5' },
+  { uk: '8', us: '9', eu: '41', cm: '26' },
+  { uk: '9', us: '10', eu: '42', cm: '27' },
+  { uk: '10', us: '11', eu: '43', cm: '27.5' },
+  { uk: '11', us: '12', eu: '44', cm: '28.5' },
+];
 
 const ProductDetail = ({ product, onBack, onAddToCart, onToggleWishlist, isWishlisted }) => {
   const [selectedSize, setSelectedSize] = useState(null);
+  const [showSizeChart, setShowSizeChart] = useState(false);
   const sizes = ['7', '8', '9', '10', '11'];
 
   const handleAddToCart = () => {
@@ -46,7 +56,7 @@ const ProductDetail = ({ product, onBack, onAddToCart, onToggleWishlist, isWishl
           <div className="size-selection">
             <div className="section-head">
               <h3>SELECT SIZE (UK)</h3>
-              <span>SIZE CHART</span>
+              <span className="size-chart-link" onClick={() => setShowSizeChart(true)}>SIZE CHART</span>
             </div>
             <div className="sizes-grid">
               {sizes.map(size => (
@@ -80,6 +90,37 @@ const ProductDetail = ({ product, onBack, onAddToCart, onToggleWishlist, isWishl
           </div>
         </div>
       </div>
+
+      <AnimatePresence>
+        {showSizeChart && (
+          <div className="size-chart-overlay" onClick={() => setShowSizeChart(false)}>
+            <motion.div
+              className="size-chart-modal"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.9 }}
+              onClick={e => e.stopPropagation()}
+            >
+              <div className="size-chart-header">
+                <h3>UK SIZE CHART</h3>
+                <button onClick={() => setShowSizeChart(false)}><X size={20} /></button>
+              </div>
+              <table className="size-table">
+                <thead>
+                  <tr><th>UK</th><th>US</th><th>EU</th><th>CM</th></tr>
+                </thead>
+                <tbody>
+                  {SIZE_CHART.map(row => (
+                    <tr key={row.uk} className={selectedSize === row.uk ? 'highlighted' : ''}>
+                      <td>{row.uk}</td><td>{row.us}</td><td>{row.eu}</td><td>{row.cm}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 };

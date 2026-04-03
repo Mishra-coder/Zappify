@@ -1123,3 +1123,18 @@ ul {
 .orders-empty span { font-size: 13px; color: #aaa; }
 .account-logout-btn { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; padding: 14px; border: 1.5px solid #e8e8e8; border-radius: 12px; background: #fff; font-size: 13px; font-weight: 700; letter-spacing: 1px; color: #555; cursor: pointer; }
 .account-logout-btn:hover { border-color: #e85d04; color: #e85d04; }
+
+/* Size Chart */
+.size-chart-link { cursor: pointer; font-size: 12px; font-weight: 700; color: #e85d04; text-decoration: underline; }
+.size-chart-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; display: flex; align-items: center; justify-content: center; }
+.size-chart-modal { background: #fff; border-radius: 16px; padding: 24px; width: 340px; }
+.size-chart-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px; }
+.size-chart-header h3 { font-size: 14px; font-weight: 800; letter-spacing: 1px; }
+.size-chart-header button { background: none; border: none; cursor: pointer; color: #888; }
+.size-table { width: 100%; border-collapse: collapse; font-size: 14px; }
+.size-table th { background: #f5f5f5; padding: 10px; text-align: center; font-weight: 700; font-size: 12px; letter-spacing: 1px; }
+.size-table td { padding: 10px; text-align: center; border-bottom: 1px solid #f0f0f0; }
+.size-table tr.highlighted td { background: #fff0e6; font-weight: 700; color: #e85d04; }
+
+/* Auth error */
+.auth-error { color: #e85d04; font-size: 13px; text-align: center; margin: -4px 0; }
