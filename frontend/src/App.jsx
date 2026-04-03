@@ -150,7 +150,7 @@ function App() {
                   />
                   <ProductGrid
                     products={filteredProducts}
-                    onProductClick={setSelectedProduct}
+                    onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
                     onToggleWishlist={toggleWishlist}
                     isWishlisted={isWishlisted}
                   />
