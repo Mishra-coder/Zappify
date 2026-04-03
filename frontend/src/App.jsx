@@ -6,6 +6,7 @@ import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
+import { GoogleLogin } from '@react-oauth/google'
 
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -272,7 +273,17 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               {isSignUp && <input type="password" placeholder="Confirm Password" />}
               <button className="btn-primary auth-btn">{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
               <div className="separator"><span>OR CONTINUE WITH</span></div>
-              <button className="btn-outline google-btn">GOOGLE</button>
+              <div className="google-btn-wrap">
+                <GoogleLogin
+                  onSuccess={(credentialResponse) => {
+                    console.log('Google login success', credentialResponse);
+                    onClose();
+                  }}
+                  onError={() => console.log('Google login failed')}
+                  width="100%"
+                  text={isSignUp ? 'signup_with' : 'signin_with'}
+                />
+              </div>
             </div>
 
             <p className="auth-footer">
