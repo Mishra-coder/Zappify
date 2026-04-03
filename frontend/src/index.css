@@ -1016,9 +1016,8 @@ ul {
 .wishlist-btn-large.wishlisted { background: #fff0e6; color: #e85d04; border-color: #e85d04; }
 
 /* Google Login Button */
-.google-btn-wrap { display: flex; justify-content: center; width: 100%; margin-top: 4px; }
-.google-btn-wrap > div { display: flex !important; justify-content: center !important; }
-.google-btn-wrap iframe { margin: 0 auto !important; }
+.google-custom-btn { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; padding: 12px; border: 1.5px solid #e0e0e0; border-radius: 10px; background: #fff; font-size: 14px; font-weight: 600; color: #333; cursor: pointer; margin-top: 4px; }
+.google-custom-btn:hover { background: #f5f5f5; border-color: #ccc; }
 
 /* User Profile in Header */
 .user-profile-wrap { position: relative; }

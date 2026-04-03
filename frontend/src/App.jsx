@@ -6,7 +6,7 @@ import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
-import { GoogleLogin, googleLogout } from '@react-oauth/google'
+import { GoogleLogin, useGoogleLogin } from '@react-oauth/google'
 import Checkout from './components/Checkout'
 import AccountModal from './components/AccountModal'
 
@@ -248,6 +248,22 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
   const isDrawer = type === 'cart' || type === 'wishlist';
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
 
+  const googleLogin = useGoogleLogin({
+    onSuccess: async (tokenResponse) => {
+      try {
+        const res = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${tokenResponse.access_token}` }
+        });
+        const data = await res.json();
+        onLoginSuccess({ name: data.name, email: data.email, picture: data.picture });
+        onClose();
+      } catch (e) {
+        console.log('Google login failed', e);
+      }
+    },
+    onError: () => console.log('Google login failed'),
+  });
+
   const handleAuth = () => {
     setError('');
     if (!formData.email || !formData.password) { setError('Please fill all fields'); return; }
@@ -376,21 +392,10 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               {error && <p className="auth-error">{error}</p>}
               <button className="btn-primary auth-btn" onClick={handleAuth}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
               <div className="separator"><span>OR CONTINUE WITH</span></div>
-              <div className="google-btn-wrap">
-                <GoogleLogin
-                  onSuccess={(credentialResponse) => {
-                    const base64 = credentialResponse.credential.split('.')[1];
-                    const decoded = JSON.parse(atob(base64));
-                    onLoginSuccess(decoded);
-                    onClose();
-                  }}
-                  onError={() => console.log('Google login failed')}
-                  width="360"
-                  text={isSignUp ? 'signup_with' : 'signin_with'}
-                  shape="rectangular"
-                  size="large"
-                />
-              </div>
+              <button className="google-custom-btn" onClick={() => googleLogin()}>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20" />
+                {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
+              </button>
             </div>
 
             <p className="auth-footer">
