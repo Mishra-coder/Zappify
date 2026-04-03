@@ -7,6 +7,7 @@ import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
 import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
 import { GoogleLogin } from '@react-oauth/google'
+import { jwtDecode } from 'jwt-decode'
 
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
@@ -18,6 +19,7 @@ function App() {
   const [sortOption, setSortOption] = useState('recommended');
   const [activeNav, setActiveNav] = useState('MEN');
   const [sneakersView, setSneakersView] = useState(false);
+  const [loggedInUser, setLoggedInUser] = useState(null);
 
   const toggleFilter = (item, type) => {
     if (type === 'category') {
@@ -90,6 +92,8 @@ function App() {
         cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
         wishlistCount={wishlistItems.length}
         activeNav={activeNav}
+        loggedInUser={loggedInUser}
+        onLogout={() => setLoggedInUser(null)}
       />
 
       <main className="app-main">
@@ -159,6 +163,7 @@ function App() {
             wishlistItems={wishlistItems}
             onRemoveFromCart={removeFromCart}
             onToggleWishlist={toggleWishlist}
+            onLoginSuccess={setLoggedInUser}
           />
         )}
       </AnimatePresence>
@@ -166,7 +171,7 @@ function App() {
   )
 }
 
-const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist }) => {
+const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess }) => {
   const [isSignUp, setIsSignUp] = useState(false);
   const isDrawer = type === 'cart' || type === 'wishlist';
   const cartTotal = cartItems.reduce((sum, i) => sum + i.price * i.qty, 0);
@@ -276,7 +281,8 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               <div className="google-btn-wrap">
                 <GoogleLogin
                   onSuccess={(credentialResponse) => {
-                    console.log('Google login success', credentialResponse);
+                    const decoded = jwtDecode(credentialResponse.credential);
+                    onLoginSuccess(decoded);
                     onClose();
                   }}
                   onError={() => console.log('Google login failed')}

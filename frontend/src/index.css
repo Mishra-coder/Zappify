@@ -1004,3 +1004,10 @@ ul {
 /* Google Login Button */
 .google-btn-wrap { display: flex; justify-content: center; width: 100%; margin-top: 4px; }
 .google-btn-wrap > div { width: 100% !important; }
+
+/* User Profile in Header */
+.user-profile-btn { display: flex; align-items: center; gap: 8px; }
+.user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; }
+.user-name { font-size: 13px; font-weight: 600; }
+.logout-btn { font-size: 12px; background: none; border: 1px solid #ddd; border-radius: 6px; padding: 4px 10px; cursor: pointer; color: #666; }
+.logout-btn:hover { border-color: #e85d04; color: #e85d04; }

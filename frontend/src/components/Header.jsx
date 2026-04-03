@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Search, ShoppingCart, Heart, User, Menu, X } from 'lucide-react';
 
-const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav }) => {
+const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav, loggedInUser, onLogout }) => {
   const [isSearchFocused, setIsSearchFocused] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
@@ -51,9 +51,17 @@ const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav
           </div>
 
           <div className="user-actions">
-            <button className="action-btn" title="Profile" onClick={() => onOpenOverlay('login')}>
-              <User size={22} />
-            </button>
+            {loggedInUser ? (
+              <div className="user-profile-btn">
+                <img src={loggedInUser.picture} alt={loggedInUser.name} className="user-avatar" />
+                <span className="user-name">{loggedInUser.name.split(' ')[0]}</span>
+                <button className="logout-btn" onClick={onLogout}>Logout</button>
+              </div>
+            ) : (
+              <button className="action-btn" title="Profile" onClick={() => onOpenOverlay('login')}>
+                <User size={22} />
+              </button>
+            )}
             <button className="action-btn" title="Wishlist" onClick={() => onOpenOverlay('wishlist')}>
               <Heart size={22} />
               {wishlistCount > 0 && <span className="badge">{wishlistCount}</span>}
