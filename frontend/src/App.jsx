@@ -128,7 +128,7 @@ function App() {
 
   return (
     <AnimatePresence mode="wait">
-      {showSplash ? (
+      {showSplash && !isEmbed ? (
         <SplashScreen key="splash" />
       ) : (
         <motion.div 
@@ -281,7 +281,7 @@ const SplashScreen = () => (
       }}
     >
       <div className="splash-logo">
-        <span>Z</span>appify
+        <img src="/logo.png" alt="Zappify" className="splash-logo-img" />
       </div>
       <div className="splash-subtitle">Premium Shoe Store</div>
       <motion.div 

@@ -1237,6 +1237,8 @@ ul {
   border: 3px solid rgba(255, 255, 255, 0.3);
   border-top-color: white;
   border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
   animation: splash-spin 0.8s linear infinite;
 }
 
@@ -1293,6 +1295,8 @@ ul {
   border: 3px solid rgba(255,255,255,0.3);
   border-top-color: #fff;
   border-radius: 50%;
+  margin-left: auto;
+  margin-right: auto;
   animation: preview-spin 0.8s linear infinite;
 }
 
@@ -1300,7 +1304,12 @@ ul {
   to { transform: rotate(360deg); }
 }
 
-.align-center { text-align: center; }
+.align-center { 
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center; 
+}
 
 .phone-header-wrapper {
   position: absolute;
@@ -1486,4 +1495,74 @@ ul {
   background: rgba(255,255,255,0.4);
   border-radius: 3px;
   margin-top: 10px;
+}
+
+.splash-logo-img {
+  width: clamp(150px, 25vw, 250px);
+  max-height: 250px;
+  object-fit: contain;
+}
+
+.preview-logo-img {
+  width: 140px;
+  height: auto;
+  object-fit: contain;
+  margin-bottom: 20px;
+}
+
+.qr-section {
+  margin-top: 40px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 15px;
+  background: rgba(255, 255, 255, 0.05);
+  padding: 24px;
+  border-radius: 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.qr-code-wrapper {
+  background: white;
+  padding: 12px;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+.qr-code-wrapper img {
+  display: block;
+}
+
+.qr-text {
+  color: #fff;
+  text-align: center;
+}
+
+.qr-text h3 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 700;
+}
+
+.qr-text p {
+  margin: 5px 0 0;
+  font-size: 13px;
+  opacity: 0.6;
+}
+
+.share-btn {
+  margin-top: 10px;
+  background: var(--brand-red);
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+
+.share-btn:hover {
+  transform: scale(1.05);
 }

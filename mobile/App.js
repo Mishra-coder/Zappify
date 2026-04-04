@@ -1,6 +1,6 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, StatusBar } from 'react-native';
+import { View, Text, StyleSheet, Animated, StatusBar, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -46,7 +46,7 @@ export default function App() {
         <StatusBar backgroundColor="#FF3D00" barStyle="light-content" />
         <Animated.View style={[styles.splashContainer, { opacity: fadeAnim }]}>
           <Animated.View style={{ transform: [{ scale: scaleAnim }], alignItems: 'center' }}>
-            <Text style={styles.splashLogo}>Zappify</Text>
+            <Image source={require('./assets/logo.png')} style={styles.splashLogoImg} />
             <Text style={styles.splashSubtitle}>Premium Shoe Store</Text>
           </Animated.View>
         </Animated.View>
@@ -80,11 +80,10 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
   },
-  splashLogo: {
-    fontSize: 64,
-    fontWeight: '900',
-    color: '#FFFFFF',
-    letterSpacing: -3,
+  splashLogoImg: {
+    width: 280,
+    height: 280,
+    resizeMode: 'contain',
   },
   splashSubtitle: {
     fontSize: 12,
