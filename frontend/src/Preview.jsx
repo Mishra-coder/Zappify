@@ -99,27 +99,6 @@ export default function Preview() {
             <div className="home-bar" />
           </div>
         </div>
-
-        <motion.div 
-          className="qr-section"
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 1, duration: 0.5 }}
-        >
-          <div className="qr-text">
-            <h3>Experience on Mobile</h3>
-            <p>Scan to see the real Zappify app on your phone</p>
-          </div>
-          <div className="qr-code-wrapper">
-             <img src={`https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(window.location.origin)}`} alt="QR Code" />
-          </div>
-          <button className="share-btn" onClick={() => {
-            navigator.clipboard.writeText(window.location.origin);
-            alert("Link copied! Share it with anyone.");
-          }}>
-            Copy App Link
-          </button>
-        </motion.div>
       </div>
     </div>
   );
