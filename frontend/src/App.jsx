@@ -1,4 +1,4 @@
-import { useState, useMemo } from 'react'
+import { useState, useMemo, useEffect } from 'react'
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import ProductGrid from './components/ProductGrid'
@@ -11,6 +11,7 @@ import Checkout from './components/Checkout'
 import AccountModal from './components/AccountModal'
 
 function App() {
+  const [showSplash, setShowSplash] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedThemes, setSelectedThemes] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -40,6 +41,13 @@ function App() {
       return JSON.parse(localStorage.getItem(`zappify_orders_${user.email}`)) || [];
     } catch { return []; }
   });
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setShowSplash(false);
+    }, 2500);
+    return () => clearTimeout(timer);
+  }, []);
 
   const userOrdersKey = (user) => `zappify_orders_${user?.email}`;
 
@@ -119,129 +127,172 @@ function App() {
   const isEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
 
   return (
-    <div className="zappify-app">
-      {!isEmbed && <Header
-        onOpenOverlay={setActiveOverlay}
-        onNavigate={handleNavigate}
-        cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
-        wishlistCount={wishlistItems.length}
-        activeNav={activeNav}
-        loggedInUser={loggedInUser}
-        onOpenAccount={() => setShowAccount(true)}
-        searchQuery={searchQuery}
-        onSearch={setSearchQuery}
-      />}
+    <AnimatePresence mode="wait">
+      {showSplash ? (
+        <SplashScreen key="splash" />
+      ) : (
+        <motion.div 
+          key="app-content"
+          className="zappify-app"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          {!isEmbed && <Header
+            onOpenOverlay={setActiveOverlay}
+            onNavigate={handleNavigate}
+            cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
+            wishlistCount={wishlistItems.length}
+            activeNav={activeNav}
+            loggedInUser={loggedInUser}
+            onOpenAccount={() => setShowAccount(true)}
+            searchQuery={searchQuery}
+            onSearch={setSearchQuery}
+          />}
 
-      <main className="app-main">
-        <div className="container-broad main-layout">
-          <AnimatePresence mode="wait">
-            {!selectedProduct ? (
-              <motion.div
-                key="grid"
-                className="grid-view"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="layout-split">
-                  <Sidebar
-                    selectedCategories={selectedCategories}
-                    selectedThemes={selectedThemes}
-                    onToggleFilter={toggleFilter}
-                  />
-                  <ProductGrid
-                    products={filteredProducts}
-                    onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                    onToggleWishlist={toggleWishlist}
-                    isWishlisted={isWishlisted}
-                  />
-                </div>
-              </motion.div>
-            ) : (
-              <motion.div
-                key="detail"
-                className="detail-view"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ProductDetail
-                  product={selectedProduct}
-                  onBack={() => setSelectedProduct(null)}
-                  onAddToCart={addToCart}
-                  onToggleWishlist={toggleWishlist}
-                  isWishlisted={isWishlisted(selectedProduct.id)}
-                />
-              </motion.div>
+          <main className="app-main">
+            <div className="container-broad main-layout">
+              <AnimatePresence mode="wait">
+                {!selectedProduct ? (
+                  <motion.div
+                    key="grid"
+                    className="grid-view"
+                    initial={{ opacity: 0, x: -20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: -20 }}
+                    transition={{ duration: 0.3 }}
+                  >
+                    <div className="layout-split">
+                      <Sidebar
+                        selectedCategories={selectedCategories}
+                        selectedThemes={selectedThemes}
+                        onToggleFilter={toggleFilter}
+                      />
+                      <ProductGrid
+                        products={filteredProducts}
+                        onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                        onToggleWishlist={toggleWishlist}
+                        isWishlisted={isWishlisted}
+                      />
+                    </div>
+                  </motion.div>
+                ) : (
+                  <motion.div
+                    key="detail"
+                    className="detail-view"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -20 }}
+                    transition={{ duration: 0.4 }}
+                  >
+                    <ProductDetail
+                      product={selectedProduct}
+                      onBack={() => setSelectedProduct(null)}
+                      onAddToCart={addToCart}
+                      onToggleWishlist={toggleWishlist}
+                      isWishlisted={isWishlisted(selectedProduct.id)}
+                    />
+                  </motion.div>
+                )}
+              </AnimatePresence>
+            </div>
+          </main>
+
+          <footer className="zappify-footer">
+            <div className="container-broad">
+              <div className="footer-bottom">
+                <p>&copy; 2026 Zappify Shoe Store. All rights reserved.</p>
+              </div>
+            </div>
+          </footer>
+
+          <AnimatePresence>
+            {activeOverlay && (
+              <Overlay
+                type={activeOverlay}
+                onClose={() => setActiveOverlay(null)}
+                cartItems={cartItems}
+                wishlistItems={wishlistItems}
+                onRemoveFromCart={removeFromCart}
+                onToggleWishlist={toggleWishlist}
+                onLoginSuccess={handleLogin}
+                onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
+                loggedInUser={loggedInUser}
+                onSwitchOverlay={setActiveOverlay}
+              />
             )}
           </AnimatePresence>
-        </div>
-      </main>
 
-      <footer className="zappify-footer">
-        <div className="container-broad">
-          <div className="footer-bottom">
-            <p>&copy; 2026 Zappify Shoe Store. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+          {showCheckout && (
+            <Checkout
+              cartItems={cartItems}
+              onClose={() => setShowCheckout(false)}
+              onRemoveFromCart={removeFromCart}
+              onOrderPlaced={(items) => {
+                const newOrders = items.map(item => ({
+                  ...item,
+                  orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                  placedAt: new Date().toISOString(),
+                  status: 'Placed',
+                }));
+                const updated = [...placedOrders, ...newOrders];
+                setPlacedOrders(updated);
+                localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
+                setCartItems([]);
+                localStorage.removeItem('zappify_cart');
+              }}
+            />
+          )}
 
-      <AnimatePresence>
-        {activeOverlay && (
-          <Overlay
-            type={activeOverlay}
-            onClose={() => setActiveOverlay(null)}
-            cartItems={cartItems}
-            wishlistItems={wishlistItems}
-            onRemoveFromCart={removeFromCart}
-            onToggleWishlist={toggleWishlist}
-            onLoginSuccess={handleLogin}
-            onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
-            loggedInUser={loggedInUser}
-            onSwitchOverlay={setActiveOverlay}
-          />
-        )}
-      </AnimatePresence>
-
-      {showCheckout && (
-        <Checkout
-          cartItems={cartItems}
-          onClose={() => setShowCheckout(false)}
-          onRemoveFromCart={removeFromCart}
-          onOrderPlaced={(items) => {
-            const newOrders = items.map(item => ({
-              ...item,
-              orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-              placedAt: new Date().toISOString(),
-              status: 'Placed',
-            }));
-            const updated = [...placedOrders, ...newOrders];
-            setPlacedOrders(updated);
-            localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
-            setCartItems([]);
-            localStorage.removeItem('zappify_cart');
-          }}
-        />
+          {showAccount && loggedInUser && (
+            <AccountModal
+              user={loggedInUser}
+              orders={placedOrders}
+              onClose={() => setShowAccount(false)}
+              onLogout={() => { handleLogout(); setShowAccount(false); }}
+              onCancelOrder={(orderId) => {
+                const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
+                setPlacedOrders(updated);
+                localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
+              }}
+            />
+          )}
+        </motion.div>
       )}
-
-      {showAccount && loggedInUser && (
-        <AccountModal
-          user={loggedInUser}
-          orders={placedOrders}
-          onClose={() => setShowAccount(false)}
-          onLogout={() => { handleLogout(); setShowAccount(false); }}
-          onCancelOrder={(orderId) => {
-            const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
-            setPlacedOrders(updated);
-            localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
-          }}
-        />
-      )}
-    </div>
+    </AnimatePresence>
   );
 }
+
+const SplashScreen = () => (
+  <motion.div 
+    className="splash-container"
+    initial={{ opacity: 1 }}
+    exit={{ opacity: 0 }}
+    transition={{ duration: 0.8, ease: "easeInOut" }}
+  >
+    <motion.div 
+      className="splash-content"
+      initial={{ scale: 0.85, opacity: 0, y: 10 }}
+      animate={{ scale: 1, opacity: 1, y: 0 }}
+      transition={{ 
+        duration: 1, 
+        ease: [0.22, 1, 0.36, 1],
+        opacity: { duration: 0.6 }
+      }}
+    >
+      <div className="splash-logo">
+        <span>Z</span>appify
+      </div>
+      <div className="splash-subtitle">Premium Shoe Store</div>
+      <motion.div 
+        className="splash-loader"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.8 }}
+      />
+    </motion.div>
+  </motion.div>
+);
 
 const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout, loggedInUser, onSwitchOverlay }) => {
   const [isSignUp, setIsSignUp] = useState(false);
