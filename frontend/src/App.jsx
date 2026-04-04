@@ -124,11 +124,10 @@ function App() {
     });
   }, [selectedCategories, selectedThemes, sneakersView, searchQuery]);
 
-  const isEmbed = new URLSearchParams(window.location.search).get('embed') === '1';
 
   return (
     <AnimatePresence mode="wait">
-      {showSplash && !isEmbed ? (
+      {showSplash ? (
         <SplashScreen key="splash" />
       ) : (
         <motion.div 
@@ -138,7 +137,7 @@ function App() {
           animate={{ opacity: 1 }}
           transition={{ duration: 0.8 }}
         >
-          {!isEmbed && <Header
+          <Header
             onOpenOverlay={setActiveOverlay}
             onNavigate={handleNavigate}
             cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
@@ -148,7 +147,7 @@ function App() {
             onOpenAccount={() => setShowAccount(true)}
             searchQuery={searchQuery}
             onSearch={setSearchQuery}
-          />}
+          />
 
           <main className="app-main">
             <div className="container-broad main-layout">

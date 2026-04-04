@@ -7,7 +7,6 @@ Built with a modern MERN stack on the backend and React + React Native on the fr
 ## Live Demo
 
 - **Website:** [zappify-sepia.vercel.app](https://zappify-sepia.vercel.app)
-- **Phone Preview:** [zappify-sepia.vercel.app/preview](https://zappify-sepia.vercel.app/preview)
 
 ---
 
@@ -112,7 +111,6 @@ Zappify is built as a real-world e-commerce application that covers the complete
 - Goes through a 3-step checkout (Bag → Address → Payment)
 - Tracks their order with a live timeline
 - Can cancel an order with a reason
-- All of this works on both web and Android mobile app
 
 ---
 
@@ -132,8 +130,8 @@ Zappify is built as a real-world e-commerce application that covers the complete
 - Google OAuth 2.0 login
 - Normal email/password sign up and sign in
 - User-specific order history per account
-- Persistent login via localStorage / AsyncStorage
-- Full Android mobile app via Expo + EAS Build
+- Persistent login via localStorage
+- Progressive Web App (PWA) ready
 
 ### For Admins
 - Secure JWT-protected API routes
@@ -203,7 +201,6 @@ Zappify/
 │       ├── components/
 │       ├── data/products.js
 │       ├── App.jsx
-│       ├── Preview.jsx
 │       ├── main.jsx
 │       └── index.css
 ├── mobile/
