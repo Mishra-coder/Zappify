@@ -292,7 +292,7 @@ export const ALL_PRODUCTS = [
     brand: 'ZAPPIFY',
     category: 'Men Slip-ons',
     theme: 'Cyber Sport',
-    price: 17992249450,
+    price: 2249,
     image: '/shoes/shoe27.jpg',
     isTrending: false,
     description: 'Exclusive release from The Souled Store collection.'
@@ -325,7 +325,7 @@ export const ALL_PRODUCTS = [
     brand: 'ZAPPIFY',
     category: 'Men Low Top Sneakers',
     theme: 'Urban Tech',
-    price: 32993599300,
+    price: 3599,
     image: '/shoes/shoe30.jpg',
     isTrending: true,
     description: 'Exclusive release from The Souled Store collection.'
@@ -380,7 +380,7 @@ export const ALL_PRODUCTS = [
     brand: 'ZAPPIFY',
     category: 'Men Mid Top Sneakers',
     theme: 'Cyber Sport',
-    price: 259936991100,
+    price: 3699,
     image: '/shoes/shoe35.jpg',
     isTrending: false,
     description: 'Exclusive release from The Souled Store collection.'
@@ -468,7 +468,7 @@ export const ALL_PRODUCTS = [
     brand: 'ZAPPIFY',
     category: 'Men Clogs',
     theme: 'Cyber Sport',
-    price: 25992999400,
+    price: 2999,
     image: '/shoes/shoe43.jpg',
     isTrending: true,
     description: 'Exclusive release from The Souled Store collection.'
