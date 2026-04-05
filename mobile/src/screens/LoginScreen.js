@@ -1,7 +1,6 @@
 import { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { Ionicons } from '@expo/vector-icons';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
@@ -75,43 +74,62 @@ export default function LoginScreen({ navigation }) {
   return (
     <SafeAreaView style={styles.safe}>
       <KeyboardAvoidingView behavior={Platform.OS === 'ios' ? 'padding' : undefined} style={{ flex: 1 }}>
-        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled">
-          <View style={styles.iconWrap}>
-            <Ionicons name="person-outline" size={40} color={colors.brand} />
-          </View>
-          <Text style={styles.heading}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
-          <Text style={styles.sub}>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</Text>
+        <ScrollView contentContainerStyle={styles.container} keyboardShouldPersistTaps="handled" showsVerticalScrollIndicator={false}>
 
-          {isSignUp && (
-            <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor={colors.gray} value={form.name} onChangeText={v => setForm({ ...form, name: v })} />
-          )}
-          <TextInput style={styles.input} placeholder="Email Address" placeholderTextColor={colors.gray} value={form.email} onChangeText={v => setForm({ ...form, email: v })} keyboardType="email-address" autoCapitalize="none" />
-          <TextInput style={styles.input} placeholder="Password" placeholderTextColor={colors.gray} value={form.password} onChangeText={v => setForm({ ...form, password: v })} secureTextEntry />
-          {isSignUp && (
-            <TextInput style={styles.input} placeholder="Confirm Password" placeholderTextColor={colors.gray} value={form.confirm} onChangeText={v => setForm({ ...form, confirm: v })} secureTextEntry />
-          )}
-
-          <TouchableOpacity style={styles.authBtn} onPress={handleAuth}>
-            <Text style={styles.authBtnTxt}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</Text>
-          </TouchableOpacity>
-
-          <View style={styles.separator}>
-            <View style={styles.sepLine} />
-            <Text style={styles.sepTxt}>OR CONTINUE WITH</Text>
-            <View style={styles.sepLine} />
+          <View style={styles.heroBanner}>
+            <Image
+            source={require('../../assets/hero-nike.png')}
+              style={styles.heroImage}
+              resizeMode="contain"
+            />
+            <TouchableOpacity style={styles.skipBtn} onPress={() => navigation.replace('Home')}>
+              <Text style={styles.skipTxt}>SKIP</Text>
+            </TouchableOpacity>
+            <View style={styles.heroBannerOverlay}>
+              <Text style={styles.heroBrandTag}>ZAPPIFY</Text>
+              <Text style={styles.heroTitle}>Premium{'\n'}Footwear</Text>
+              <Text style={styles.heroSub}>Step into the future</Text>
+            </View>
           </View>
 
-          <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn}>
-            <Text style={styles.googleG}>G</Text>
-            <Text style={styles.googleBtnTxt}>{isSignUp ? 'Sign up with Google' : 'Sign in with Google'}</Text>
-          </TouchableOpacity>
+          <View style={styles.formCard}>
+            <Text style={styles.heading}>{isSignUp ? 'Create Account' : 'Welcome Back'}</Text>
+            <Text style={styles.sub}>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</Text>
 
-          <TouchableOpacity style={styles.switchBtn} onPress={() => setIsSignUp(!isSignUp)}>
-            <Text style={styles.switchTxt}>
-              {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
-              <Text style={styles.switchLink}>{isSignUp ? 'Sign In' : 'Sign Up'}</Text>
-            </Text>
-          </TouchableOpacity>
+            {isSignUp && (
+              <TextInput style={styles.input} placeholder="Full Name" placeholderTextColor={colors.gray} value={form.name} onChangeText={v => setForm({ ...form, name: v })} />
+            )}
+            <TextInput style={styles.input} placeholder="Email Address" placeholderTextColor={colors.gray} value={form.email} onChangeText={v => setForm({ ...form, email: v })} keyboardType="email-address" autoCapitalize="none" />
+            <TextInput style={styles.input} placeholder="Password" placeholderTextColor={colors.gray} value={form.password} onChangeText={v => setForm({ ...form, password: v })} secureTextEntry />
+            {isSignUp && (
+              <TextInput style={styles.input} placeholder="Confirm Password" placeholderTextColor={colors.gray} value={form.confirm} onChangeText={v => setForm({ ...form, confirm: v })} secureTextEntry />
+            )}
+
+            <TouchableOpacity style={styles.authBtn} onPress={handleAuth}>
+              <Text style={styles.authBtnTxt}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</Text>
+            </TouchableOpacity>
+
+            <View style={styles.separator}>
+              <View style={styles.sepLine} />
+              <Text style={styles.sepTxt}>OR</Text>
+              <View style={styles.sepLine} />
+            </View>
+
+            <TouchableOpacity style={styles.googleBtn} onPress={handleGoogleSignIn}>
+              <View style={styles.googleIconWrap}>
+                <Text style={styles.googleG}>G</Text>
+              </View>
+              <Text style={styles.googleBtnTxt}>Continue with Google</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity style={styles.switchBtn} onPress={() => setIsSignUp(!isSignUp)}>
+              <Text style={styles.switchTxt}>
+                {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
+                <Text style={styles.switchLink}>{isSignUp ? 'Sign In' : 'Sign Up'}</Text>
+              </Text>
+            </TouchableOpacity>
+          </View>
+
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>
@@ -120,20 +138,85 @@ export default function LoginScreen({ navigation }) {
 
 const styles = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.white },
-  container: { padding: 28, alignItems: 'center' },
-  iconWrap: { width: 80, height: 80, borderRadius: 40, backgroundColor: colors.brandLight, alignItems: 'center', justifyContent: 'center', marginBottom: 20, marginTop: 20 },
-  heading: { fontSize: 26, fontWeight: '800', color: colors.dark, marginBottom: 6 },
-  sub: { fontSize: 14, color: colors.gray, marginBottom: 28 },
-  input: { width: '100%', borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, color: colors.dark, marginBottom: 14 },
-  authBtn: { width: '100%', backgroundColor: colors.brand, borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 4 },
+  container: { flexGrow: 1 },
+  heroBanner: {
+    height: 280,
+    backgroundColor: '#000',
+    position: 'relative',
+    overflow: 'hidden',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  heroImage: {
+    width: '100%',
+    height: '100%',
+    position: 'absolute',
+    opacity: 0.7,
+  },
+  heroBannerOverlay: {
+    position: 'absolute',
+    bottom: 24,
+    left: 24,
+  },
+  skipBtn: {
+    position: 'absolute',
+    top: 16,
+    right: 16,
+    backgroundColor: 'rgba(255,255,255,0.15)',
+    paddingHorizontal: 14,
+    paddingVertical: 6,
+    borderRadius: 20,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+  },
+  skipTxt: {
+    color: '#fff',
+    fontSize: 12,
+    fontWeight: '700',
+    letterSpacing: 1,
+  },
+  heroBrandTag: {
+    color: '#FF6B00',
+    fontSize: 10,
+    fontWeight: '900',
+    letterSpacing: 3,
+    marginBottom: 6,
+  },
+  heroTitle: {
+    color: '#fff',
+    fontSize: 32,
+    fontWeight: '900',
+    lineHeight: 36,
+    letterSpacing: -1,
+    marginBottom: 4,
+  },
+  heroSub: {
+    color: '#94A3B8',
+    fontSize: 13,
+    fontWeight: '500',
+  },
+  formCard: {
+    flex: 1,
+    backgroundColor: colors.white,
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 28,
+    padding: 28,
+    paddingBottom: 40,
+    marginTop: -20,
+  },
+  heading: { fontSize: 24, fontWeight: '800', color: colors.dark, marginBottom: 4 },
+  sub: { fontSize: 14, color: colors.gray, marginBottom: 24 },
+  input: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 16, paddingVertical: 14, fontSize: 15, color: colors.dark, marginBottom: 14 },
+  authBtn: { backgroundColor: '#D83100', borderRadius: 12, paddingVertical: 16, alignItems: 'center', marginTop: 4 },
   authBtnTxt: { color: colors.white, fontWeight: '800', fontSize: 15, letterSpacing: 1 },
-  separator: { flexDirection: 'row', alignItems: 'center', width: '100%', marginVertical: 16, gap: 10 },
+  separator: { flexDirection: 'row', alignItems: 'center', marginVertical: 20, gap: 10 },
   sepLine: { flex: 1, height: 1, backgroundColor: colors.border },
-  sepTxt: { fontSize: 11, color: colors.gray, fontWeight: '600', letterSpacing: 0.5 },
-  googleBtn: { width: '100%', flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingVertical: 14 },
-  googleG: { fontSize: 18, fontWeight: '800', color: '#4285F4' },
-  googleBtnTxt: { fontSize: 14, fontWeight: '600', color: colors.dark },
-  switchBtn: { marginTop: 20 },
-  switchTxt: { fontSize: 14, color: colors.gray },
-  switchLink: { color: colors.brand, fontWeight: '700' },
+  sepTxt: { fontSize: 12, color: colors.gray, fontWeight: '600', letterSpacing: 1 },
+  googleBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingVertical: 14, backgroundColor: colors.white },
+  googleIconWrap: { width: 24, height: 24, borderRadius: 12, backgroundColor: '#fff', alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: '#e0e0e0' },
+  googleG: { fontSize: 14, fontWeight: '900', color: '#4285F4' },
+  googleBtnTxt: { fontSize: 15, fontWeight: '600', color: colors.dark },
+  switchBtn: { marginTop: 20, alignItems: 'center', width: '100%' },
+  switchTxt: { fontSize: 14, color: colors.gray, textAlign: 'center' },
+  switchLink: { color: '#D83100', fontWeight: '700' },
 });

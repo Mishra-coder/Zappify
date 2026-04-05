@@ -4,6 +4,7 @@ import { View, Text, StyleSheet, Animated, StatusBar, Image } from 'react-native
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppProvider } from './src/context/AppContext';
 
 import HomeScreen from './src/screens/HomeScreen';
@@ -18,10 +19,15 @@ const Stack = createNativeStackNavigator();
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
+  const [initialRoute, setInitialRoute] = useState('Login');
   const fadeAnim = useRef(new Animated.Value(1)).current;
   const scaleAnim = useRef(new Animated.Value(0.95)).current;
 
   useEffect(() => {
+    AsyncStorage.getItem('zappify_user').then(saved => {
+      if (saved) setInitialRoute('Home');
+    });
+
     Animated.loop(
       Animated.sequence([
         Animated.timing(scaleAnim, { toValue: 1.05, duration: 1000, useNativeDriver: true }),
@@ -58,7 +64,7 @@ export default function App() {
     <SafeAreaProvider>
       <AppProvider>
         <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
             <Stack.Screen name="Cart" component={CartScreen} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -17,19 +17,11 @@ export default function AccountScreen({ navigation }) {
   const [cancelReason, setCancelReason] = useState('');
   const [showConfirm, setShowConfirm] = useState(false);
 
-  if (!user) {
-    return (
-      <SafeAreaView style={styles.safe}>
-        <View style={styles.guestBox}>
-          <Ionicons name="person-outline" size={56} color={colors.border} />
-          <Text style={styles.guestTitle}>You're not logged in</Text>
-          <TouchableOpacity style={styles.loginBtn} onPress={() => navigation.navigate('Login')}>
-            <Text style={styles.loginBtnTxt}>LOGIN / SIGN UP</Text>
-          </TouchableOpacity>
-        </View>
-      </SafeAreaView>
-    );
-  }
+  useEffect(() => {
+    if (!user) navigation.replace('Login');
+  }, [user]);
+
+  if (!user) return null;
 
   const handleCancelConfirm = () => {
     if (!cancelReason) { Alert.alert('Select Reason', 'Please select a reason'); return; }
@@ -212,10 +204,6 @@ const styles = StyleSheet.create({
   statusTxtCancelled: { color: colors.danger },
   logoutBtn: { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, paddingVertical: 14, marginTop: 8 },
   logoutTxt: { fontSize: 13, fontWeight: '700', color: colors.gray, letterSpacing: 1 },
-  guestBox: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
-  guestTitle: { fontSize: 16, fontWeight: '700', color: colors.gray },
-  loginBtn: { backgroundColor: colors.brand, paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12 },
-  loginBtnTxt: { color: colors.white, fontWeight: '800', fontSize: 14, letterSpacing: 1 },
   odHeader: { backgroundColor: colors.lightGray, borderRadius: 10, padding: 14, gap: 4 },
   odLabel: { fontSize: 13, color: colors.gray },
   odVal: { fontWeight: '700', color: colors.dark },

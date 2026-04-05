@@ -1,17 +1,16 @@
-import { useState, useMemo, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import Header from './components/Header'
 import Sidebar from './components/Sidebar'
 import ProductGrid from './components/ProductGrid'
 import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
+import { X, ShoppingBag, Heart, Trash2 } from 'lucide-react'
 import { useGoogleLogin } from '@react-oauth/google'
 import Checkout from './components/Checkout'
 import AccountModal from './components/AccountModal'
 
 function App() {
-  const [showSplash, setShowSplash] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOverlay, setActiveOverlay] = useState(null);
@@ -41,13 +40,6 @@ function App() {
       return JSON.parse(localStorage.getItem(`zappify_orders_${user.email}`)) || [];
     } catch { return []; }
   });
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      setShowSplash(false);
-    }, 2500);
-    return () => clearTimeout(timer);
-  }, []);
 
   const userOrdersKey = (user) => `zappify_orders_${user?.email}`;
 
@@ -152,10 +144,7 @@ function App() {
 
   return (
     <AnimatePresence mode="wait">
-      {showSplash ? (
-        <SplashScreen key="splash" />
-      ) : (
-        <motion.div 
+      <motion.div 
           key="app-content"
           className="zappify-app"
           initial={{ opacity: 0 }}
@@ -311,41 +300,9 @@ function App() {
             />
           )}
         </motion.div>
-      )}
     </AnimatePresence>
   );
 }
-
-const SplashScreen = () => (
-  <motion.div 
-    className="splash-container"
-    initial={{ opacity: 1 }}
-    exit={{ opacity: 0 }}
-    transition={{ duration: 0.8, ease: "easeInOut" }}
-  >
-    <motion.div 
-      className="splash-content"
-      initial={{ scale: 0.85, opacity: 0, y: 10 }}
-      animate={{ scale: 1, opacity: 1, y: 0 }}
-      transition={{ 
-        duration: 1, 
-        ease: [0.22, 1, 0.36, 1],
-        opacity: { duration: 0.6 }
-      }}
-    >
-      <div className="splash-logo">
-        <img src="/logo.png" alt="Zappify" className="splash-logo-img" />
-      </div>
-      <div className="splash-subtitle">Premium Shoe Store</div>
-      <motion.div 
-        className="splash-loader"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.8 }}
-      />
-    </motion.div>
-  </motion.div>
-);
 
 const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, onToggleWishlist, onLoginSuccess, onCheckout, loggedInUser, onSwitchOverlay }) => {
   const [isSignUp, setIsSignUp] = useState(false);
@@ -475,15 +432,19 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
           </div>
         </motion.div>
       ) : (
-        <motion.div className="modal" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}>
-          <div className="modal-header">
-            <button className="close-btn" onClick={onClose}><X size={24} /></button>
+        <motion.div className="modal login-modal-new" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}>
+          <div className="login-hero-banner">
+            <img src="/hero-nike.png" alt="Nike" className="login-hero-img" />
+            <button className="close-btn login-close-btn" onClick={onClose}><X size={20} /></button>
+            <div className="login-hero-overlay">
+              <p className="login-hero-tag">ZAPPIFY</p>
+              <h2 className="login-hero-title">Premium<br />Footwear</h2>
+              <p className="login-hero-sub">Step into the future</p>
+            </div>
           </div>
-          <div className="modal-content login-modal">
-            <User size={48} className="user-icon-large" />
+          <div className="login-form-card">
             <h2>{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>
             <p>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</p>
-
             <div className="auth-form">
               {isSignUp && <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />}
               <input type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
@@ -491,13 +452,12 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               {isSignUp && <input type="password" placeholder="Confirm Password" value={formData.confirm} onChange={e => setFormData({ ...formData, confirm: e.target.value })} />}
               {error && <p className="auth-error">{error}</p>}
               <button className="btn-primary auth-btn" onClick={handleAuth}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
-              <div className="separator"><span>OR CONTINUE WITH</span></div>
-              <button className="google-custom-btn" onClick={() => googleLogin()}>
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
-                {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
+              <div className="separator"><span>OR</span></div>
+              <button className="google-proper-btn" onClick={() => googleLogin()}>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="google-icon-large" />
+                <span>{isSignUp ? 'Sign up with Google' : 'Sign in with Google'}</span>
               </button>
             </div>
-
             <p className="auth-footer">
               {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
               <span onClick={() => setIsSignUp(!isSignUp)}>{isSignUp ? 'Sign In' : 'Sign Up'}</span>
