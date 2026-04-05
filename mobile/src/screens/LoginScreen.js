@@ -38,7 +38,7 @@ export default function LoginScreen({ navigation }) {
         picture: userInfo.data.user.photo,
       };
       await login(user);
-      navigation.goBack();
+      navigation.replace('Home');
     } catch (error) {
       if (error.code === statusCodes.SIGN_IN_CANCELLED) return;
       if (error.code === statusCodes.IN_PROGRESS) return;
@@ -54,14 +54,14 @@ export default function LoginScreen({ navigation }) {
       if (form.password.length < 6) { Alert.alert('Error', 'Password must be at least 6 characters'); return; }
       const user = { name: form.name, email: form.email, picture: null };
       await login(user);
-      navigation.goBack();
+      navigation.replace('Home');
     } else {
       const saved = await AsyncStorage.getItem('zappify_user');
       if (saved) {
         const u = JSON.parse(saved);
         if (u.email === form.email) {
           await login(u);
-          navigation.goBack();
+          navigation.replace('Home');
         } else {
           Alert.alert('Error', 'Account not found. Please sign up first.');
         }
