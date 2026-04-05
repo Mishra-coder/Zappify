@@ -4,6 +4,10 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
+import RazorpayCheckout from 'react-native-razorpay';
+
+const API_URL = 'http://10.254.200.236:5001';
+const RAZORPAY_KEY_ID = 'rzp_test_SZtLthHdKYuLeQ';
 
 const STEPS = ['MY BAG', 'ADDRESS', 'PAYMENT'];
 const PAYMENT_OPTIONS = [
@@ -21,8 +25,54 @@ export default function CheckoutScreen({ navigation }) {
   const shipping = cartTotal > 999 ? 0 : 99;
 
   const handlePlaceOrder = async () => {
-    await placeOrder(cartItems);
-    setDone(true);
+    if (payment === 'cod') {
+      await placeOrder(cartItems);
+      setDone(true);
+      return;
+    }
+    try {
+      const res = await fetch(`${API_URL}/api/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: cartTotal + shipping }),
+      });
+      const data = await res.json();
+
+      const options = {
+        description: 'Shoe Purchase',
+        image: 'https://zappify-sepia.vercel.app/logo.png',
+        currency: 'INR',
+        key: RAZORPAY_KEY_ID,
+        amount: data.amount,
+        order_id: data.orderId,
+        name: 'Zappify',
+        prefill: { contact: address.phone, name: address.name },
+        theme: { color: '#D83100' },
+      };
+
+      RazorpayCheckout.open(options)
+        .then(async (response) => {
+          const verifyRes = await fetch(`${API_URL}/api/payment/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            await placeOrder(cartItems);
+            setDone(true);
+          } else {
+            Alert.alert('Failed', 'Payment verification failed.');
+          }
+        })
+        .catch((error) => {
+          if (error.code !== 'PAYMENT_CANCELLED') {
+            Alert.alert('Payment Failed', error.description || 'Something went wrong.');
+          }
+        });
+    } catch {
+      Alert.alert('Error', 'Could not connect to server. Is backend running?');
+    }
   };
 
   if (done) {

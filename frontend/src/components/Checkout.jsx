@@ -14,9 +14,67 @@ const Checkout = ({ cartItems, onClose, onOrderPlaced }) => {
   const gst = Math.round(cartTotal * 0.05);
   const shipping = cartTotal > 999 ? 0 : 99;
 
-  const handlePlaceOrder = () => {
-    if (onOrderPlaced) onOrderPlaced(cartItems);
-    setOrderPlaced(true);
+  const loadRazorpayScript = () =>
+    new Promise((resolve) => {
+      if (document.getElementById('razorpay-script')) return resolve(true);
+      const script = document.createElement('script');
+      script.id = 'razorpay-script';
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
+  const handlePlaceOrder = async () => {
+    if (paymentMethod === 'cod') {
+      if (onOrderPlaced) onOrderPlaced(cartItems);
+      setOrderPlaced(true);
+      return;
+    }
+
+    const totalAmount = cartTotal + shipping;
+    const loaded = await loadRazorpayScript();
+    if (!loaded) { alert('Razorpay failed to load. Check your internet.'); return; }
+
+    try {
+      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: totalAmount }),
+      });
+      const data = await res.json();
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Zappify',
+        description: 'Shoe Purchase',
+        order_id: data.orderId,
+        handler: async (response) => {
+          const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            if (onOrderPlaced) onOrderPlaced(cartItems);
+            setOrderPlaced(true);
+          } else {
+            alert('Payment verification failed. Contact support.');
+          }
+        },
+        prefill: { name: address.name, contact: address.phone },
+        theme: { color: '#FF3D00' },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error('Razorpay error:', err);
+      alert(`Error: ${err.message || 'Something went wrong. Is backend running on port 5001?'}`);
+    }
   };
 
   if (orderPlaced) {

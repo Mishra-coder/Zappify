@@ -1,5 +1,4 @@
 export const ALL_PRODUCTS = [
-  // ── WOMEN / UNISEX (existing, no gender = shown in ALL) ──
   {
     id: 105,
     name: "Nike Journey Run",
@@ -201,7 +200,6 @@ export const ALL_PRODUCTS = [
       "Boasting Nike's tallest heel bag yet, these sneakers offer a super-soft ride that feels as good as it looks.",
   },
 
-  // ── MEN ──
   {
     id: 201,
     name: "Men's Street Runner Pro",
