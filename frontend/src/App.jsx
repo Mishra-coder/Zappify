@@ -113,7 +113,7 @@ function App() {
 
   const filteredProducts = useMemo(() => {
     return ALL_PRODUCTS.filter(product => {
-      const sneakerMatch = sneakersView ? product.id >= 30 && product.id <= 44 : true;
+      const sneakerMatch = sneakersView ? product.brand === 'NIKE' : true;
       const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
       const themeMatch = selectedThemes.length === 0 || selectedThemes.includes(product.theme);
       const searchMatch = searchQuery.trim() === '' ||
@@ -167,12 +167,20 @@ function App() {
                         selectedThemes={selectedThemes}
                         onToggleFilter={toggleFilter}
                       />
-                      <ProductGrid
-                        products={filteredProducts}
-                        onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        onToggleWishlist={toggleWishlist}
-                        isWishlisted={isWishlisted}
-                      />
+                      <div className="content-area">
+                        {!searchQuery && !selectedCategories.length && !selectedThemes.length && (
+                          <HeroBanner onExplore={() => {
+                            setSearchQuery('Nike');
+                            window.scrollTo({ top: 600, behavior: 'smooth' });
+                          }} />
+                        )}
+                        <ProductGrid
+                          products={filteredProducts}
+                          onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                          onToggleWishlist={toggleWishlist}
+                          isWishlisted={isWishlisted}
+                        />
+                      </div>
                     </div>
                   </motion.div>
                 ) : (
@@ -326,7 +334,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
       const user = {
         name: formData.name,
         email: formData.email,
-        picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=e85d04&color=fff`,
+        picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=E85D04&color=fff`,
       };
       onLoginSuccess(user);
       onClose();
@@ -439,7 +447,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               <button className="btn-primary auth-btn" onClick={handleAuth}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
               <div className="separator"><span>OR CONTINUE WITH</span></div>
               <button className="google-custom-btn" onClick={() => googleLogin()}>
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20" />
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" />
                 {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
               </button>
             </div>
@@ -454,5 +462,54 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
     </div>
   );
 };
+
+const HeroBanner = ({ onExplore }) => (
+  <motion.section 
+    className="hero-banner"
+    initial={{ opacity: 0, y: 15 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+  >
+    <div className="hero-image-box">
+      <img src="/hero-nike.png" alt="Hero Shoe" />
+    </div>
+    <div className="hero-content">
+      <motion.p 
+        className="hero-tag"
+        initial={{ opacity: 0, x: -15 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        SPRING COLLECTION 2026
+      </motion.p>
+      <motion.h1
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        Experience The Future <br /> Of Streetwear
+      </motion.h1>
+      <motion.p 
+        className="hero-subtitle"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+      >
+        Unmatched comfort. Uncompromising style. Crafted for those who move.
+      </motion.p>
+      <motion.button 
+        className="btn-primary hero-cta"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9 }}
+        whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(255, 107, 0, 0.3)' }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onExplore}
+      >
+        EXPLORE NOW
+      </motion.button>
+    </div>
+  </motion.section>
+);
 
 export default App;
