@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert, KeyboardAvoidingView, Platform, ScrollView, Image } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -23,6 +23,14 @@ export default function LoginScreen({ navigation }) {
   const [isSignUp, setIsSignUp] = useState(false);
   const [form, setForm] = useState({ name: '', email: '', password: '', confirm: '' });
   const { login } = useApp();
+
+  useEffect(() => {
+    const checkUser = async () => {
+      const saved = await AsyncStorage.getItem('zappify_user');
+      if (saved) navigation.replace('Home');
+    };
+    checkUser();
+  }, []);
 
   const handleGoogleSignIn = async () => {
     if (!GoogleSignin) {
