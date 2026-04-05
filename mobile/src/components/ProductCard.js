@@ -17,7 +17,6 @@ export default function ProductCard({ product, onPress }) {
           source={typeof product.image === 'string' ? { uri: product.image } : product.image} 
           style={styles.image} 
           resizeMode="cover"
-          defaultSource={{ uri: 'https://images.nike.com/is/image/DotCom/DJ9151_001_A_PREM?wid=512&fmt=webp&resMode=sharp2' }}
         />
         {product.isTrending && (
           <View style={styles.trendBadge}>
@@ -37,7 +36,7 @@ export default function ProductCard({ product, onPress }) {
         <Text style={styles.brand} numberOfLines={1}>{product.brand}</Text>
         <Text style={styles.name} numberOfLines={1}>{product.name}</Text>
         <Text style={styles.category} numberOfLines={1}>
-          {product.category.indexOf('Men ') === 0 ? product.category.substring(4) : product.category}
+          {product.category.slice(0, 4) === 'Men ' ? product.category.slice(4) : product.category}
         </Text>
         <View style={styles.priceRow}>
           <Text style={styles.price}>₹{product.price.toLocaleString('en-IN')}</Text>
