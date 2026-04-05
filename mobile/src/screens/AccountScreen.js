@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, Modal } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -84,7 +84,7 @@ export default function AccountScreen({ navigation }) {
             ) : (
               orders.map((order, i) => (
                 <TouchableOpacity key={i} style={styles.orderItem} onPress={() => { setSelectedOrder(order); setView('detail'); }}>
-                  <Image source={{ uri: order.image }} style={styles.orderImg} />
+                  <Image source={typeof order.image === 'string' ? { uri: order.image } : order.image} style={styles.orderImg} />
                   <View style={styles.orderInfo}>
                     <Text style={styles.orderName} numberOfLines={1}>{order.name}</Text>
                     <Text style={styles.orderMeta}>Size: UK {order.size}  ·  Qty: {order.qty}</Text>
@@ -114,7 +114,7 @@ export default function AccountScreen({ navigation }) {
               <Text style={styles.odLabel}>Date: <Text style={styles.odVal}>{formatDate(selectedOrder.placedAt)}</Text></Text>
             </View>
             <View style={styles.odItem}>
-              <Image source={{ uri: selectedOrder.image }} style={styles.odImg} />
+              <Image source={typeof selectedOrder.image === 'string' ? { uri: selectedOrder.image } : selectedOrder.image} style={styles.odImg} />
               <View style={styles.odInfo}>
                 <Text style={styles.odName}>{selectedOrder.name}</Text>
                 <Text style={styles.odMeta}>Size: UK {selectedOrder.size}  ·  Qty: {selectedOrder.qty}</Text>

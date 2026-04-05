@@ -15,6 +15,14 @@ const Header = ({ onOpenOverlay, onNavigate, cartCount, wishlistCount, activeNav
           <ul className={`nav-links ${isMobileMenuOpen ? 'mobile-open' : ''}`}>
             <li>
               <button
+                className={`nav-item ${activeNav === 'ALL' || (!activeNav) ? 'active' : ''}`}
+                onClick={() => { onNavigate('home'); setIsMobileMenuOpen(false); }}
+              >
+                ALL
+              </button>
+            </li>
+            <li>
+              <button
                 className={`nav-item ${activeNav === 'MEN' ? 'active' : ''}`}
                 onClick={() => { onNavigate('MEN'); setIsMobileMenuOpen(false); }}
               >

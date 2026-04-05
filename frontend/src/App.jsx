@@ -13,14 +13,14 @@ import AccountModal from './components/AccountModal'
 function App() {
   const [showSplash, setShowSplash] = useState(true);
   const [selectedCategories, setSelectedCategories] = useState([]);
-  const [selectedThemes, setSelectedThemes] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOverlay, setActiveOverlay] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
-  const [activeNav, setActiveNav] = useState('MEN');
+  const [activeNav, setActiveNav] = useState('ALL');
   const [sneakersView, setSneakersView] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+  const [showNikeBanner, setShowNikeBanner] = useState(false);
 
   const [cartItems, setCartItems] = useState(() => {
     try { return JSON.parse(localStorage.getItem('zappify_cart')) || []; } catch { return []; }
@@ -66,18 +66,21 @@ function App() {
 
   const toggleFilter = (item, type) => {
     if (type === 'category') {
-      setSelectedCategories(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
-    } else {
-      setSelectedThemes(prev => prev.includes(item) ? prev.filter(i => i !== item) : [...prev, item]);
+      if (selectedCategories.includes(item)) {
+        setSelectedCategories(selectedCategories.filter(i => i !== item));
+      } else {
+        setSelectedCategories([...selectedCategories, item]);
+      }
     }
   };
 
   const handleNavigate = (destination) => {
     setSelectedProduct(null);
     setSelectedCategories([]);
-    setSelectedThemes([]);
+    setShowNikeBanner(false);
     setSneakersView(destination === 'SNEAKERS');
     if (destination !== 'home') setActiveNav(destination);
+    else setActiveNav('ALL');
   };
 
   const addToCart = (product, size) => {
@@ -112,17 +115,39 @@ function App() {
   const isWishlisted = (id) => wishlistItems.some(i => i.id === id);
 
   const filteredProducts = useMemo(() => {
-    return ALL_PRODUCTS.filter(product => {
-      const sneakerMatch = sneakersView ? product.brand === 'NIKE' : true;
-      const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-      const themeMatch = selectedThemes.length === 0 || selectedThemes.includes(product.theme);
-      const searchMatch = searchQuery.trim() === '' ||
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return sneakerMatch && categoryMatch && themeMatch && searchMatch;
-    });
-  }, [selectedCategories, selectedThemes, sneakersView, searchQuery]);
+    const searchMatch = (product) =>
+      searchQuery.trim() === '' ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const categoryMatch = (product) =>
+      selectedCategories.length === 0 || selectedCategories.includes(product.category);
+
+    if (showNikeBanner) {
+      return ALL_PRODUCTS.filter(p => p.brand === 'NIKE' && !p.gender && searchMatch(p));
+    }
+
+    if (activeNav === 'MEN') {
+      const menProducts = ALL_PRODUCTS.filter(p =>
+        p.gender === 'MEN' && searchMatch(p) && categoryMatch(p)
+      );
+      const nikeOriginal = ALL_PRODUCTS.filter(p =>
+        !p.gender && searchMatch(p) && categoryMatch(p)
+      );
+      return [...menProducts, ...nikeOriginal];
+    }
+
+    if (activeNav === 'SNEAKERS' || sneakersView) {
+      return ALL_PRODUCTS.filter(p =>
+        p.brand === 'NIKE' && !p.gender && searchMatch(p) && categoryMatch(p)
+      );
+    }
+
+    return ALL_PRODUCTS.filter(p =>
+      searchMatch(p) && categoryMatch(p)
+    );
+  }, [selectedCategories, sneakersView, searchQuery, activeNav, showNikeBanner]);
 
 
   return (
@@ -146,63 +171,84 @@ function App() {
             loggedInUser={loggedInUser}
             onOpenAccount={() => setShowAccount(true)}
             searchQuery={searchQuery}
-            onSearch={setSearchQuery}
+            onSearch={(q) => { setSearchQuery(q); if (!q) setShowNikeBanner(false); }}
           />
 
           <main className="app-main">
-            <div className="container-broad main-layout">
-              <AnimatePresence mode="wait">
-                {!selectedProduct ? (
-                  <motion.div
-                    key="grid"
-                    className="grid-view"
-                    initial={{ opacity: 0, x: -20 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -20 }}
-                    transition={{ duration: 0.3 }}
-                  >
-                    <div className="layout-split">
-                      <Sidebar
-                        selectedCategories={selectedCategories}
-                        selectedThemes={selectedThemes}
-                        onToggleFilter={toggleFilter}
-                      />
-                      <div className="content-area">
-                        {!searchQuery && !selectedCategories.length && !selectedThemes.length && (
-                          <HeroBanner onExplore={() => {
-                            setSearchQuery('Nike');
-                            window.scrollTo({ top: 600, behavior: 'smooth' });
-                          }} />
-                        )}
-                        <ProductGrid
-                          products={filteredProducts}
-                          onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                          onToggleWishlist={toggleWishlist}
-                          isWishlisted={isWishlisted}
+            <AnimatePresence mode="wait">
+              <div className="container-broad main-layout">
+                <AnimatePresence mode="wait">
+                  {!selectedProduct ? (
+                    <motion.div
+                      key="grid"
+                      className="grid-view"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
+                    >
+                      <div className="layout-split">
+                        <Sidebar
+                          selectedCategories={selectedCategories}
+                          onToggleFilter={toggleFilter}
                         />
+                        <div className="content-area">
+                          {!searchQuery && !selectedCategories.length && (
+                            <HeroBanner onExplore={() => {
+                              setShowNikeBanner(true);
+                              setSearchQuery('Nike');
+                            }} />
+                          )}
+                          {showNikeBanner && (
+                            <div className="nike-info-banner">
+                              <div className="nike-banner-content">
+                                <p className="nike-banner-tag">SPRING COLLECTION 2026</p>
+                                <h2 className="nike-banner-title">20 Iconic<br />Nike Shoes</h2>
+                                <p className="nike-banner-sub">Handpicked for you — the finest kicks from Nike's latest lineup.</p>
+                                <div className="nike-banner-stats">
+                                  <div className="nike-stat"><span className="nike-stat-num">20</span><span className="nike-stat-label">Products</span></div>
+                                  <div className="nike-stat-divider" />
+                                  <div className="nike-stat"><span className="nike-stat-num">7</span><span className="nike-stat-label">Categories</span></div>
+                                  <div className="nike-stat-divider" />
+                                  <div className="nike-stat"><span className="nike-stat-num">2026</span><span className="nike-stat-label">Collection</span></div>
+                                </div>
+                                <button className="nike-banner-btn" onClick={() => { setShowNikeBanner(false); setSearchQuery(''); }}>← Back to All</button>
+                              </div>
+                              <div className="nike-banner-img">
+                                <img src="/hero-nike.png" alt="Nike" />
+                              </div>
+                            </div>
+                          )}
+                          <ProductGrid
+                            products={filteredProducts}
+                            onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            onToggleWishlist={toggleWishlist}
+                            isWishlisted={isWishlisted}
+                          />
+                        </div>
                       </div>
-                    </div>
-                  </motion.div>
-                ) : (
-                  <motion.div
-                    key="detail"
-                    className="detail-view"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -20 }}
-                    transition={{ duration: 0.4 }}
-                  >
-                    <ProductDetail
-                      product={selectedProduct}
-                      onBack={() => setSelectedProduct(null)}
-                      onAddToCart={addToCart}
-                      onToggleWishlist={toggleWishlist}
-                      isWishlisted={isWishlisted(selectedProduct.id)}
-                    />
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="detail"
+                      className="detail-view"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <ProductDetail
+                        product={selectedProduct}
+                        onBack={() => setSelectedProduct(null)}
+                        onAddToCart={addToCart}
+                        onToggleWishlist={toggleWishlist}
+                        isWishlisted={isWishlisted(selectedProduct.id)}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </AnimatePresence>
           </main>
 
           <footer className="zappify-footer">
@@ -470,9 +516,6 @@ const HeroBanner = ({ onExplore }) => (
     animate={{ opacity: 1, y: 0 }}
     transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
   >
-    <div className="hero-image-box">
-      <img src="/hero-nike.png" alt="Hero Shoe" />
-    </div>
     <div className="hero-content">
       <motion.p 
         className="hero-tag"
@@ -508,6 +551,9 @@ const HeroBanner = ({ onExplore }) => (
       >
         EXPLORE NOW
       </motion.button>
+    </div>
+    <div className="hero-image-box">
+      <img src="/hero-nike.png" alt="Hero Shoe" />
     </div>
   </motion.section>
 );

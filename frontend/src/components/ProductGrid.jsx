@@ -18,7 +18,7 @@ const ProductGrid = ({ products, onProductClick, onToggleWishlist, isWishlisted 
       {products.length === 0 && (
         <div className="no-products">
           <h3>No products found match the selected filters.</h3>
-          <p>Try adjusting your categories or themes.</p>
+          <p>Try adjusting your categories.</p>
         </div>
       )}
     </div>

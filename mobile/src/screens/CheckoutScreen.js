@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -48,7 +48,7 @@ export default function CheckoutScreen({ navigation }) {
 
       <View style={styles.stepsRow}>
         {STEPS.map((s, i) => (
-          <React.Fragment key={s}>
+          <Fragment key={s}>
             <View style={styles.stepItem}>
               <View style={[styles.stepCircle, i <= step && styles.stepCircleActive, i < step && styles.stepCircleDone]}>
                 {i < step
@@ -59,7 +59,7 @@ export default function CheckoutScreen({ navigation }) {
               <Text style={[styles.stepLabel, i <= step && styles.stepLabelActive]}>{s}</Text>
             </View>
             {i < STEPS.length - 1 && <View style={[styles.stepLine, i < step && styles.stepLineDone]} />}
-          </React.Fragment>
+          </Fragment>
         ))}
       </View>
 
@@ -148,15 +148,14 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: '800', letterSpacing: 1.5, color: colors.dark },
   stepsRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16 },
   stepItem: { alignItems: 'center', gap: 4 },
-  stepCircle: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
-  stepCircleActive: { borderColor: colors.brand },
-  stepCircleDone: { backgroundColor: colors.brand, borderColor: colors.brand },
+  stepCircleDone: { backgroundColor: '#D83100', borderColor: '#D83100' },
+  stepCircleActive: { borderColor: '#D83100' },
   stepNum: { fontSize: 12, fontWeight: '700', color: colors.gray },
-  stepNumActive: { color: colors.brand },
+  stepNumActive: { color: '#D83100' },
   stepLabel: { fontSize: 10, fontWeight: '700', color: colors.gray, letterSpacing: 0.5 },
-  stepLabelActive: { color: colors.brand },
+  stepLabelActive: { color: '#D83100' },
   stepLine: { flex: 1, height: 2, backgroundColor: colors.border, marginBottom: 16 },
-  stepLineDone: { backgroundColor: colors.brand },
+  stepLineDone: { backgroundColor: '#D83100' },
   body: { padding: 20, paddingBottom: 40 },
   bagItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
   bagInfo: { flex: 1 },
@@ -170,7 +169,7 @@ const styles = StyleSheet.create({
   totalRow: { paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 4 },
   totalLabel: { fontSize: 15, fontWeight: '800', color: colors.dark },
   totalVal: { fontSize: 16, fontWeight: '900', color: colors.dark },
-  nextBtn: { flex: 1, backgroundColor: colors.brand, borderRadius: 12, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  nextBtn: { flex: 1, backgroundColor: '#D83100', borderRadius: 12, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   nextTxt: { color: colors.white, fontWeight: '800', fontSize: 13, letterSpacing: 0.5 },
   btnRow: { flexDirection: 'row', gap: 10, marginTop: 8 },
   backBtn: { paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
@@ -179,15 +178,15 @@ const styles = StyleSheet.create({
   formRow: { flexDirection: 'row', gap: 10 },
   input: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: colors.dark, marginBottom: 12 },
   payOption: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, marginBottom: 10 },
-  payOptionActive: { borderColor: colors.brand, backgroundColor: colors.brandLight },
+  payOptionActive: { borderColor: '#D83100', backgroundColor: 'rgba(216,49,0,0.06)' },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
-  radioActive: { borderColor: colors.brand },
-  radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.brand },
+  radioActive: { borderColor: '#D83100' },
+  radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#D83100' },
   payLabel: { fontSize: 14, fontWeight: '500', color: colors.dark },
   successBox: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
-  successIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  successIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#D83100', alignItems: 'center', justifyContent: 'center' },
   successTitle: { fontSize: 24, fontWeight: '800', color: colors.dark },
   successMsg: { fontSize: 14, color: colors.gray, textAlign: 'center', lineHeight: 22 },
-  continueBtn: { backgroundColor: colors.brand, paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginTop: 8 },
+  continueBtn: { backgroundColor: '#D83100', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginTop: 8 },
   continueTxt: { color: colors.white, fontWeight: '800', fontSize: 14, letterSpacing: 1 },
 });

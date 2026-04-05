@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { View, Text, Image, ScrollView, TouchableOpacity, StyleSheet, Alert, Modal, Dimensions } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -26,7 +26,7 @@ export default function ProductDetailScreen({ route, navigation }) {
   const handleAddToCart = () => {
     if (!selectedSize) { Alert.alert('Select Size', 'Please select a size first'); return; }
     addToCart(product, selectedSize);
-    Alert.alert('Added!', `${product.name} (UK ${selectedSize}) added to cart`);
+    navigation.navigate('Cart');
   };
 
   return (
@@ -45,7 +45,11 @@ export default function ProductDetailScreen({ route, navigation }) {
 
       <ScrollView showsVerticalScrollIndicator={false} contentContainerStyle={styles.scroll}>
         <View style={styles.imageContainer}>
-          <Image source={{ uri: product.image }} style={styles.image} resizeMode="contain" />
+          <Image
+            source={typeof product.image === 'string' ? { uri: product.image } : product.image}
+            style={styles.image}
+            resizeMode="contain"
+          />
         </View>
 
         <View style={styles.body}>
@@ -164,7 +168,7 @@ const styles = StyleSheet.create({
   perkTitle: { fontSize: 14, fontWeight: '700', color: colors.dark },
   perkSub: { fontSize: 12, color: colors.gray, fontWeight: '500' },
   footer: { position: 'absolute', bottom: 0, width: '100%', padding: 20, paddingBottom: 35, backgroundColor: colors.white, shadowColor: colors.dark, shadowOpacity: 0.1, shadowRadius: 10, elevation: 10, borderTopWidth: 1, borderTopColor: colors.border },
-  cartBtn: { height: 60, backgroundColor: colors.dark, borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
+  cartBtn: { height: 60, backgroundColor: '#D83100', borderRadius: 20, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 12 },
   cartBtnTxt: { color: colors.white, fontWeight: '800', fontSize: 16, letterSpacing: 0.5 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(15,23,42,0.8)', justifyContent: 'flex-end' },
   modalBox: { backgroundColor: colors.white, borderTopLeftRadius: 30, borderTopRightRadius: 30, padding: 25, maxHeight: '60%' },

@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -44,7 +43,7 @@ export default function CartScreen({ navigation }) {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <View style={styles.item}>
-            <Image source={{ uri: item.image }} style={styles.itemImg} resizeMode="cover" />
+            <Image source={typeof item.image === 'string' ? { uri: item.image } : item.image} style={styles.itemImg} resizeMode="cover" />
             <View style={styles.itemInfo}>
               <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>
               <Text style={styles.itemMeta}>Size: UK {item.size}  ·  Qty: {item.qty}</Text>
@@ -95,10 +94,10 @@ const styles = StyleSheet.create({
   totalRow: { paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 4 },
   totalLabel: { fontSize: 16, fontWeight: '800', color: colors.dark },
   totalVal: { fontSize: 18, fontWeight: '900', color: colors.dark },
-  checkoutBtn: { backgroundColor: colors.brand, borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
+  checkoutBtn: { backgroundColor: '#D83100', borderRadius: 14, paddingVertical: 16, alignItems: 'center', marginTop: 8 },
   checkoutTxt: { color: colors.white, fontWeight: '800', fontSize: 14, letterSpacing: 1 },
   empty: { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 16 },
   emptyTitle: { fontSize: 16, fontWeight: '700', color: colors.gray },
-  shopBtn: { backgroundColor: colors.brand, paddingHorizontal: 24, paddingVertical: 12, borderRadius: 10 },
+  shopBtn: { backgroundColor: '#D83100', paddingHorizontal: 24, paddingVertical: 12, borderRadius: 10 },
   shopBtnTxt: { color: colors.white, fontWeight: '700', fontSize: 13 },
 });
