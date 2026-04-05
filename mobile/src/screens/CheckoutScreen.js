@@ -91,14 +91,14 @@ export default function CheckoutScreen({ navigation }) {
           <View>
             <Text style={styles.sectionTitle}>DELIVERY ADDRESS</Text>
             <View style={styles.formRow}>
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Full Name *" value={address.name} onChangeText={v => setAddress({ ...address, name: v })} />
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Phone *" value={address.phone} onChangeText={v => setAddress({ ...address, phone: v })} keyboardType="phone-pad" />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Full Name *" placeholderTextColor={colors.gray} value={address.name} onChangeText={v => setAddress({ ...address, name: v })} />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Phone *" placeholderTextColor={colors.gray} value={address.phone} onChangeText={v => setAddress({ ...address, phone: v })} keyboardType="phone-pad" />
             </View>
-            <TextInput style={styles.input} placeholder="Street Address *" value={address.street} onChangeText={v => setAddress({ ...address, street: v })} />
+            <TextInput style={styles.input} placeholder="Street Address *" placeholderTextColor={colors.gray} value={address.street} onChangeText={v => setAddress({ ...address, street: v })} />
             <View style={styles.formRow}>
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Pincode *" value={address.pincode} onChangeText={v => setAddress({ ...address, pincode: v })} keyboardType="numeric" />
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="City *" value={address.city} onChangeText={v => setAddress({ ...address, city: v })} />
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="State *" value={address.state} onChangeText={v => setAddress({ ...address, state: v })} />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Pincode *" placeholderTextColor={colors.gray} value={address.pincode} onChangeText={v => setAddress({ ...address, pincode: v })} keyboardType="numeric" />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="City *" placeholderTextColor={colors.gray} value={address.city} onChangeText={v => setAddress({ ...address, city: v })} />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="State *" placeholderTextColor={colors.gray} value={address.state} onChangeText={v => setAddress({ ...address, state: v })} />
             </View>
             <View style={styles.btnRow}>
               <TouchableOpacity style={styles.backBtn} onPress={() => setStep(0)}><Text style={styles.backTxt}>BACK</Text></TouchableOpacity>
