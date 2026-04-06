@@ -4,7 +4,13 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
-import RazorpayCheckout from 'react-native-razorpay';
+
+let RazorpayCheckout = null;
+try {
+  RazorpayCheckout = require('react-native-razorpay').default;
+} catch (e) {
+  RazorpayCheckout = null;
+}
 
 const API_URL = 'https://zappify-dz5a.vercel.app';
 const RAZORPAY_KEY_ID = 'rzp_test_SZtLthHdKYuLeQ';
@@ -30,6 +36,11 @@ export default function CheckoutScreen({ navigation }) {
       setDone(true);
       return;
     }
+    if (!RazorpayCheckout) {
+      Alert.alert('Not Available', 'Payment via card/UPI requires the full app build. Please use Cash on Delivery.');
+      return;
+    }
+
     try {
       const res = await fetch(`${API_URL}/api/payment/create-order`, {
         method: 'POST',

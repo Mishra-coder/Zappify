@@ -48,12 +48,11 @@ export default function App() {
 
   if (showSplash) {
     return (
-      <View style={{ flex: 1, backgroundColor: '#FF3D00' }}>
-        <StatusBar backgroundColor="#FF3D00" barStyle="light-content" />
+      <View style={{ flex: 1, backgroundColor: '#000000' }}>
+        <StatusBar backgroundColor="#000000" barStyle="light-content" />
         <Animated.View style={[styles.splashContainer, { opacity: fadeAnim }]}>
           <Animated.View style={{ transform: [{ scale: scaleAnim }], alignItems: 'center' }}>
-            <Image source={require('./assets/logo.png')} style={styles.splashLogoImg} />
-            <Text style={styles.splashSubtitle}>Premium Shoe Store</Text>
+            <Image source={require('./assets/logo1.png')} style={styles.splashLogoImg} />
           </Animated.View>
         </Animated.View>
       </View>
@@ -82,13 +81,13 @@ export default function App() {
 const styles = StyleSheet.create({
   splashContainer: {
     flex: 1,
-    backgroundColor: '#FF3D00',
+    backgroundColor: '#000000',
     justifyContent: 'center',
     alignItems: 'center',
   },
   splashLogoImg: {
-    width: 280,
-    height: 280,
+    width: 380,
+    height: 220,
     resizeMode: 'contain',
   },
   splashSubtitle: {
@@ -98,7 +97,7 @@ const styles = StyleSheet.create({
     textTransform: 'uppercase',
     letterSpacing: 6,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: 16,
     fontWeight: '700',
   },
 });
