@@ -7,6 +7,7 @@ Built with a modern MERN stack on the backend and React + React Native on the fr
 ## Live Demo
 
 - **Website:** [zappify-sepia.vercel.app](https://zappify-sepia.vercel.app)
+- **Backend API:** [zappify-dz5a.vercel.app](https://zappify-dz5a.vercel.app)
 
 ---
 
@@ -36,6 +37,7 @@ Built with a modern MERN stack on the backend and React + React Native on the fr
 ![Bcrypt](https://img.shields.io/badge/Bcrypt.js-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white)
 ![Helmet](https://img.shields.io/badge/Helmet-FF6B35?style=for-the-badge&logo=helmet&logoColor=white)
 ![Morgan](https://img.shields.io/badge/Morgan-000000?style=for-the-badge&logo=npm&logoColor=white)
+![Razorpay](https://img.shields.io/badge/Razorpay-02042B?style=for-the-badge&logo=razorpay&logoColor=3395FF)
 
 ### Infrastructure
 ![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
@@ -49,12 +51,12 @@ Built with a modern MERN stack on the backend and React + React Native on the fr
 ```
 +-------------------------------------------------------------------+
 |                                                                   |
-|  +-------------+      +-------------+      +-------------+       |
-|  |  Front-end  |      |  Back-end   |      |  Database   |       |
-|  |   ReactJS   |<---->|   NodeJS    |<---->|  MongoDB    |       |
-|  |UI Components|      |  ExpressJS  |      | Collections |       |
-|  | API calls   |      |API endpoints|      |  Documents  |       |
-|  +-------------+      +-------------+      +-------------+       |
+|  +-------------+      +-------------+      +-------------+        |
+|  |  Front-end  |      |  Back-end   |      |  Database   |        |
+|  |   ReactJS   |<---->|   NodeJS    |<---->|  MongoDB    |        |
+|  |UI Components|      |  ExpressJS  |      | Collections |        |
+|  | API calls   |      |API endpoints|      |  Documents  |        |
+|  +-------------+      +-------------+      +-------------+        |
 |                                                                   |
 +-------------------------------------------------------------------+
 ```
@@ -100,6 +102,17 @@ Orders {
 
 ---
 
+## Payment Testing
+
+Razorpay is integrated in test mode. Use these credentials to test payments:
+
+| Method | Details |
+|---|---|
+| Card | 5267 3181 8797 5449 / Expiry: 08/26 / CVV: 123 / OTP: 1234 |
+| UPI | success@razorpay |
+
+---
+
 ## What This Project Does
 
 Zappify is built as a real-world e-commerce application that covers the complete shopping journey:
@@ -125,6 +138,8 @@ Zappify is built as a real-world e-commerce application that covers the complete
 - Add to cart with size validation
 - Wishlist toggle on product cards and detail page
 - 3-step checkout - Bag to Address to Payment (COD / UPI / Card)
+- Razorpay payment gateway integration (UPI, Card, Netbanking, Wallet)
+- Payment signature verification on backend
 - Order history with tracking timeline
 - Order cancellation with reason selection form
 - Google OAuth 2.0 login
@@ -166,6 +181,8 @@ PORT=5001
 MONGO_URI=your_mongodb_uri
 JWT_SECRET=your_secret_key
 NODE_ENV=development
+RAZORPAY_KEY_ID=your_razorpay_key_id
+RAZORPAY_KEY_SECRET=your_razorpay_key_secret
 ```
 
 ```bash
@@ -231,6 +248,18 @@ Zappify/
 | GET | /api/products | Get all products | No |
 | GET | /api/products/:id | Get product by ID | No |
 | POST | /api/products | Create product | Admin |
+| POST | /api/payment/create-order | Create Razorpay order | No |
+| POST | /api/payment/verify | Verify payment signature | No |
+
+---
+
+## Frontend Environment Variables
+
+Create `frontend/.env`:
+```env
+VITE_API_URL=http://localhost:5001
+VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
+```
 
 ---
 
