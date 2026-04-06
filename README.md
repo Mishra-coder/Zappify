@@ -7,7 +7,7 @@ Built with a modern MERN stack on the backend and React + React Native on the fr
 ## Live Demo
 
 - **Website:** [zappify-sepia.vercel.app](https://zappify-sepia.vercel.app)
-- **Backend API:** [zappify-dz5a.vercel.app](https://zappify-dz5a.vercel.app)
+- **Download APK:** https://expo.dev/accounts/devendra.mi/projects/zappify/builds/24237286-1ff7-4219-ac7a-6c103ff28d00
 
 ---
 
