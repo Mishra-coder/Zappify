@@ -1,5 +1,6 @@
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
+const { validateEmail } = require('../utils/validate');
 
 const generateToken = (id) => {
     return jwt.sign({ id }, process.env.JWT_SECRET, {
@@ -28,9 +29,7 @@ const authUser = async (req, res) => {
 const registerUser = async (req, res) => {
     const { name, email, password } = req.body;
 
-    const atIndex = email.indexOf('@');
-    const dotIndex = email.lastIndexOf('.');
-    if (atIndex < 1 || dotIndex < atIndex + 2 || dotIndex === email.length - 1) {
+    if (!validateEmail(email)) {
         return res.status(400).json({ message: 'Please enter a valid email' });
     }
 
