@@ -6,7 +6,7 @@ import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
 import RazorpayCheckout from 'react-native-razorpay';
 
-const API_URL = 'http://10.254.200.236:5001';
+const API_URL = 'https://zappify-dz5a.vercel.app';
 const RAZORPAY_KEY_ID = 'rzp_test_SZtLthHdKYuLeQ';
 
 const STEPS = ['MY BAG', 'ADDRESS', 'PAYMENT'];
