@@ -1,3 +1,4 @@
+require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const helmet = require('helmet');
@@ -6,10 +7,6 @@ const connectDB = require('./config/db');
 const userRoutes = require('./routes/userRoutes');
 const productRoutes = require('./routes/productRoutes');
 const paymentRoutes = require('./routes/paymentRoutes');
-
-if (process.env.NODE_ENV !== 'production') {
-    require('dotenv').config();
-}
 
 connectDB();
 
