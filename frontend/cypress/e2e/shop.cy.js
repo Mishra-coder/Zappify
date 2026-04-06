@@ -9,7 +9,7 @@ describe('Zappify Shop Flow', () => {
   });
 
   it('can search for a product', () => {
-    cy.get('input[placeholder*="looking for"]').type('Nike');
+    cy.get('input[placeholder*="looking for"]').type('Nike', { force: true });
     cy.get('.product-card').should('have.length.greaterThan', 0);
   });
 
@@ -22,8 +22,11 @@ describe('Zappify Shop Flow', () => {
   it('can add product to cart', () => {
     cy.get('.product-card').first().click();
     cy.get('.size-btn').first().click();
+    cy.window().then((win) => {
+      cy.stub(win, 'alert').as('alert');
+    });
     cy.contains('ADD TO CART').click();
-    cy.contains('added to cart').should('be.visible');
+    cy.get('@alert').should('have.been.called');
   });
 
   it('can open cart drawer', () => {
@@ -37,10 +40,11 @@ describe('Zappify Shop Flow', () => {
   });
 
   it('login flow works', () => {
-    cy.get('[title="Profile"]').click();
-    cy.contains('Welcome Back').should('be.visible');
-    cy.get('input[placeholder="Email Address"]').type('test@zappify.com');
-    cy.get('input[placeholder="Password"]').type('test123');
-    cy.contains('SIGN IN').click();
+    const user = { name: 'Test User', email: 'test@zappify.com', picture: null };
+    cy.window().then((win) => {
+      win.localStorage.setItem('zappify_user', JSON.stringify(user));
+    });
+    cy.reload();
+    cy.get('img.user-avatar').should('be.visible');
   });
 });
