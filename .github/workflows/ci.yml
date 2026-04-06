@@ -54,3 +54,28 @@ jobs:
 
       - name: Lint
         run: npm run lint
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: backend
+    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            if [ ! -d "/home/ubuntu/Zappify" ]; then
+              git clone https://github.com/Mishra-coder/Zappify.git /home/ubuntu/Zappify
+            fi
+            cd /home/ubuntu/Zappify
+            git pull origin main
+            cd backend
+            npm install --production
+            pm2 restart zappify-backend || pm2 start server.js --name zappify-backend
+            pm2 save
