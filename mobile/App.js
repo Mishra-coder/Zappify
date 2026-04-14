@@ -1,11 +1,13 @@
 import 'react-native-gesture-handler';
 import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, Animated, StatusBar, Image } from 'react-native';
+import { View, StyleSheet, Animated, StatusBar, Image, Text } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { AppProvider } from './src/context/AppContext';
+import { Ionicons } from '@expo/vector-icons';
+import { AppProvider, useApp } from './src/context/AppContext';
 
 import HomeScreen from './src/screens/HomeScreen';
 import ProductDetailScreen from './src/screens/ProductDetailScreen';
@@ -16,6 +18,83 @@ import LoginScreen from './src/screens/LoginScreen';
 import AccountScreen from './src/screens/AccountScreen';
 
 const Stack = createNativeStackNavigator();
+const Tab = createBottomTabNavigator();
+
+// Bottom Tab Navigator with badge support
+function TabNavigator() {
+  const { cartItems, wishlistItems } = useApp();
+  const cartCount = cartItems.reduce((sum, item) => sum + item.qty, 0);
+  const wishlistCount = wishlistItems.length;
+
+  return (
+    <Tab.Navigator
+      screenOptions={({ route }) => ({
+        headerShown: false,
+        tabBarIcon: ({ focused, color }) => {
+          let iconName;
+          const iconSize = 26;
+
+          if (route.name === 'HomeTab') {
+            iconName = 'home';
+          } else if (route.name === 'WishlistTab') {
+            iconName = 'heart';
+          } else if (route.name === 'CartTab') {
+            iconName = 'cart';
+          } else if (route.name === 'AccountTab') {
+            iconName = 'person';
+          }
+
+          return (
+            <View style={styles.tabIconContainer}>
+              <View style={[
+                styles.iconWrapper,
+                focused && styles.iconWrapperActive
+              ]}>
+                <Ionicons
+                  name={focused ? iconName : `${iconName}-outline`}
+                  size={iconSize}
+                  color={color}
+                />
+                {/* Badge for Cart */}
+                {route.name === 'CartTab' && cartCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{cartCount > 99 ? '99+' : cartCount}</Text>
+                  </View>
+                )}
+                {/* Badge for Wishlist */}
+                {route.name === 'WishlistTab' && wishlistCount > 0 && (
+                  <View style={styles.badge}>
+                    <Text style={styles.badgeText}>{wishlistCount > 99 ? '99+' : wishlistCount}</Text>
+                  </View>
+                )}
+              </View>
+            </View>
+          );
+        },
+        tabBarActiveTintColor: '#FF5722',
+        tabBarInactiveTintColor: '#9E9E9E',
+        tabBarStyle: {
+          backgroundColor: '#FFFFFF',
+          borderTopWidth: 0,
+          elevation: 8,
+          shadowColor: '#000',
+          shadowOffset: { width: 0, height: -2 },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          height: 65,
+          paddingBottom: 10,
+          paddingTop: 10,
+        },
+        tabBarShowLabel: false,
+      })}
+    >
+      <Tab.Screen name="HomeTab" component={HomeScreen} />
+      <Tab.Screen name="WishlistTab" component={WishlistScreen} />
+      <Tab.Screen name="CartTab" component={CartScreen} />
+      <Tab.Screen name="AccountTab" component={AccountScreen} />
+    </Tab.Navigator>
+  );
+}
 
 export default function App() {
   const [showSplash, setShowSplash] = useState(true);
@@ -64,13 +143,10 @@ export default function App() {
       <AppProvider>
         <NavigationContainer>
           <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
-            <Stack.Screen name="Home" component={HomeScreen} />
-            <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
-            <Stack.Screen name="Cart" component={CartScreen} />
-            <Stack.Screen name="Wishlist" component={WishlistScreen} />
-            <Stack.Screen name="Checkout" component={CheckoutScreen} />
             <Stack.Screen name="Login" component={LoginScreen} />
-            <Stack.Screen name="Account" component={AccountScreen} />
+            <Stack.Screen name="Home" component={TabNavigator} />
+            <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
+            <Stack.Screen name="Checkout" component={CheckoutScreen} />
           </Stack.Navigator>
         </NavigationContainer>
       </AppProvider>
@@ -99,5 +175,41 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginTop: 16,
     fontWeight: '700',
+  },
+  tabIconContainer: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 60,
+    height: 45,
+  },
+  iconWrapper: {
+    position: 'relative',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 50,
+    height: 40,
+    borderRadius: 12,
+  },
+  iconWrapperActive: {
+    backgroundColor: '#FFF3F0',
+  },
+  badge: {
+    position: 'absolute',
+    right: 6,
+    top: 2,
+    backgroundColor: '#FF5722',
+    borderRadius: 10,
+    minWidth: 18,
+    height: 18,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 5,
+    borderWidth: 2,
+    borderColor: '#FFFFFF',
+  },
+  badgeText: {
+    color: '#FFFFFF',
+    fontSize: 10,
+    fontWeight: 'bold',
   },
 });
