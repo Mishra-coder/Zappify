@@ -1,10 +1,10 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ChevronRight, MapPin, CreditCard, ShoppingBag, Check } from 'lucide-react';
+import { X, ChevronRight, MapPin, CreditCard, Check } from 'lucide-react';
 
 const STEPS = ['MY BAG', 'ADDRESS', 'PAYMENT'];
 
-const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
+const Checkout = ({ cartItems, onClose, onOrderPlaced }) => {
   const [step, setStep] = useState(0);
   const [address, setAddress] = useState({ name: '', phone: '', pincode: '', city: '', state: '', street: '' });
   const [paymentMethod, setPaymentMethod] = useState('cod');
@@ -14,20 +14,86 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
   const gst = Math.round(cartTotal * 0.05);
   const shipping = cartTotal > 999 ? 0 : 99;
 
-  const handlePlaceOrder = () => {
-    if (onOrderPlaced) onOrderPlaced(cartItems);
-    setOrderPlaced(true);
+  const loadRazorpayScript = () =>
+    new Promise((resolve) => {
+      if (document.getElementById('razorpay-script')) return resolve(true);
+      const script = document.createElement('script');
+      script.id = 'razorpay-script';
+      script.src = 'https://checkout.razorpay.com/v1/checkout.js';
+      script.onload = () => resolve(true);
+      script.onerror = () => resolve(false);
+      document.body.appendChild(script);
+    });
+
+  const handlePlaceOrder = async () => {
+    if (paymentMethod === 'cod') {
+      if (onOrderPlaced) onOrderPlaced(cartItems);
+      setOrderPlaced(true);
+      return;
+    }
+
+    const totalAmount = cartTotal + shipping;
+    const loaded = await loadRazorpayScript();
+    if (!loaded) { alert('Razorpay failed to load. Check your internet.'); return; }
+
+    const apiBase = import.meta.env.VITE_API_URL || '';
+
+    try {
+      const res = await fetch(`${apiBase}/api/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: totalAmount }),
+      });
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Server error ${res.status}: ${errText || 'No response from server'}`);
+      }
+
+      const text = await res.text();
+      if (!text) throw new Error('Empty response from payment server. Make sure the backend is running and VITE_API_URL is set correctly.');
+      const data = JSON.parse(text);
+
+      const options = {
+        key: import.meta.env.VITE_RAZORPAY_KEY_ID,
+        amount: data.amount,
+        currency: data.currency,
+        name: 'Zappify',
+        description: 'Shoe Purchase',
+        order_id: data.orderId,
+        handler: async (response) => {
+          const verifyRes = await fetch(`${apiBase}/api/payment/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response),
+          });
+          const verifyText = await verifyRes.text();
+          if (!verifyText) { alert('Payment verification failed: empty response from server.'); return; }
+          const verifyData = JSON.parse(verifyText);
+          if (verifyData.success) {
+            if (onOrderPlaced) onOrderPlaced(cartItems);
+            setOrderPlaced(true);
+          } else {
+            alert('Payment verification failed. Contact support.');
+          }
+        },
+        prefill: { name: address.name, contact: address.phone },
+        theme: { color: '#FF3D00' },
+      };
+
+      const rzp = new window.Razorpay(options);
+      rzp.open();
+    } catch (err) {
+      console.error('Razorpay error:', err);
+      alert(`Error: ${err.message || 'Something went wrong. Is backend running on port 5001?'}`);
+    }
   };
 
   if (orderPlaced) {
     return (
       <div className="checkout-overlay">
         <div className="checkout-modal">
-          <motion.div
-            className="order-success"
-            initial={{ scale: 0.8, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-          >
+          <motion.div className="order-success" initial={{ scale: 0.8, opacity: 0 }} animate={{ scale: 1, opacity: 1 }}>
             <div className="success-icon"><Check size={40} /></div>
             <h2>Order Placed!</h2>
             <p>Your order has been placed successfully. You'll receive a confirmation soon.</p>
@@ -40,36 +106,26 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
 
   return (
     <div className="checkout-overlay">
-      <motion.div
-        className="checkout-modal"
-        initial={{ opacity: 0, y: 40 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: 40 }}
-      >
-        {/* Header */}
+      <motion.div className="checkout-modal" initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 40 }}>
         <div className="checkout-header">
           <h2>CHECKOUT</h2>
           <button className="close-btn" onClick={onClose}><X size={22} /></button>
         </div>
 
-        {/* Steps */}
         <div className="checkout-steps">
           {STEPS.map((s, i) => (
-            <React.Fragment key={s}>
+            <div key={s} style={{ display: 'flex', alignItems: 'center', flex: i < STEPS.length - 1 ? 1 : 'none' }}>
               <div className={`step-item ${i <= step ? 'active' : ''} ${i < step ? 'done' : ''}`}>
                 <div className="step-circle">{i < step ? <Check size={14} /> : i + 1}</div>
                 <span>{s}</span>
               </div>
               {i < STEPS.length - 1 && <div className={`step-line ${i < step ? 'done' : ''}`} />}
-            </React.Fragment>
+            </div>
           ))}
         </div>
 
-        {/* Step Content */}
         <div className="checkout-body">
           <AnimatePresence mode="wait">
-
-            {/* STEP 1: MY BAG */}
             {step === 0 && (
               <motion.div key="bag" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="co-items">
@@ -103,7 +159,6 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
               </motion.div>
             )}
 
-            {/* STEP 2: ADDRESS */}
             {step === 1 && (
               <motion.div key="address" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="co-address-form">
@@ -121,23 +176,19 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
                 </div>
                 <div className="co-btn-row">
                   <button className="btn-outline co-back-btn" onClick={() => setStep(0)}>BACK</button>
-                  <button
-                    className="btn-primary co-next-btn"
-                    onClick={() => {
-                      if (!address.name || !address.phone || !address.street || !address.city || !address.pincode) {
-                        alert('Please fill all required fields');
-                        return;
-                      }
-                      setStep(2);
-                    }}
-                  >
+                  <button className="btn-primary co-next-btn" onClick={() => {
+                    if (!address.name || !address.phone || !address.street || !address.city || !address.pincode) {
+                      alert('Please fill all required fields');
+                      return;
+                    }
+                    setStep(2);
+                  }}>
                     PROCEED TO PAYMENT <ChevronRight size={18} />
                   </button>
                 </div>
               </motion.div>
             )}
 
-            {/* STEP 3: PAYMENT */}
             {step === 2 && (
               <motion.div key="payment" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -20 }}>
                 <div className="co-payment">
@@ -154,7 +205,6 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
                       </label>
                     ))}
                   </div>
-
                   <div className="co-billing">
                     <h4>ORDER SUMMARY</h4>
                     <div className="billing-row"><span>Cart Total</span><span>₹ {cartTotal.toLocaleString('en-IN')}</span></div>
@@ -164,13 +214,10 @@ const Checkout = ({ cartItems, onClose, onRemoveFromCart, onOrderPlaced }) => {
                 </div>
                 <div className="co-btn-row">
                   <button className="btn-outline co-back-btn" onClick={() => setStep(1)}>BACK</button>
-                  <button className="btn-primary co-next-btn place-order-btn" onClick={handlePlaceOrder}>
-                    PLACE ORDER
-                  </button>
+                  <button className="btn-primary co-next-btn place-order-btn" onClick={handlePlaceOrder}>PLACE ORDER</button>
                 </div>
               </motion.div>
             )}
-
           </AnimatePresence>
         </div>
       </motion.div>

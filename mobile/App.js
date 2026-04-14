@@ -1,9 +1,10 @@
 import 'react-native-gesture-handler';
-import React from 'react';
-import { View, Text } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, StyleSheet, Animated, StatusBar, Image } from 'react-native';
 import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { AppProvider } from './src/context/AppContext';
 
 import HomeScreen from './src/screens/HomeScreen';
@@ -17,11 +18,52 @@ import AccountScreen from './src/screens/AccountScreen';
 const Stack = createNativeStackNavigator();
 
 export default function App() {
+  const [showSplash, setShowSplash] = useState(true);
+  const [initialRoute, setInitialRoute] = useState('Login');
+  const fadeAnim = useRef(new Animated.Value(1)).current;
+  const scaleAnim = useRef(new Animated.Value(0.95)).current;
+
+  useEffect(() => {
+    AsyncStorage.getItem('zappify_user').then(saved => {
+      if (saved) setInitialRoute('Home');
+    });
+
+    Animated.loop(
+      Animated.sequence([
+        Animated.timing(scaleAnim, { toValue: 1.05, duration: 1000, useNativeDriver: true }),
+        Animated.timing(scaleAnim, { toValue: 0.95, duration: 1000, useNativeDriver: true }),
+      ])
+    ).start();
+
+    const timer = setTimeout(() => {
+      Animated.timing(fadeAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }).start(() => setShowSplash(false));
+    }, 2500);
+
+    return () => clearTimeout(timer);
+  }, []);
+
+  if (showSplash) {
+    return (
+      <View style={{ flex: 1, backgroundColor: '#000000' }}>
+        <StatusBar backgroundColor="#000000" barStyle="light-content" />
+        <Animated.View style={[styles.splashContainer, { opacity: fadeAnim }]}>
+          <Animated.View style={{ transform: [{ scale: scaleAnim }], alignItems: 'center' }}>
+            <Image source={require('./assets/logo1.png')} style={styles.splashLogoImg} />
+          </Animated.View>
+        </Animated.View>
+      </View>
+    );
+  }
+
   return (
     <SafeAreaProvider>
       <AppProvider>
         <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
+          <Stack.Navigator screenOptions={{ headerShown: false }} initialRouteName={initialRoute}>
             <Stack.Screen name="Home" component={HomeScreen} />
             <Stack.Screen name="ProductDetail" component={ProductDetailScreen} />
             <Stack.Screen name="Cart" component={CartScreen} />
@@ -35,3 +77,27 @@ export default function App() {
     </SafeAreaProvider>
   );
 }
+
+const styles = StyleSheet.create({
+  splashContainer: {
+    flex: 1,
+    backgroundColor: '#000000',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  splashLogoImg: {
+    width: 380,
+    height: 220,
+    resizeMode: 'contain',
+  },
+  splashSubtitle: {
+    fontSize: 12,
+    color: '#FFFFFF',
+    opacity: 0.9,
+    textTransform: 'uppercase',
+    letterSpacing: 6,
+    textAlign: 'center',
+    marginTop: 16,
+    fontWeight: '700',
+  },
+});

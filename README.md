@@ -1,194 +1,184 @@
 # Zappify Shoes 👟
 
-Zappify is a full-stack premium shoe e-commerce platform available on both **Web** and **Mobile (Android)**. It offers a seamless shopping experience — from browsing 44+ curated shoe collections to placing orders, tracking deliveries, and managing your account — all in one place.
+<p align="center">
+  <img src="assets/zappify_mockup.png" alt="Zappify Mockup" width="800">
+</p>
 
-Built with a modern MERN stack on the backend and React + React Native on the frontend, Zappify is designed for performance, clean UI, and real-world usability.
+Zappify is a full-stack premium shoe e-commerce platform available on both **Web** and **Mobile (Android)**. It offers a seamless shopping experience — from browsing curated shoe collections to placing orders and managing your account.
+
+Built with a clean MERN stack on the backend and React + React Native on the frontend, Zappify is designed for performance, clean UI, and real-world usability.
 
 ## Live Demo
 
 - **Website:** [zappify-sepia.vercel.app](https://zappify-sepia.vercel.app)
-- **Phone Preview:** [zappify-sepia.vercel.app/preview](https://zappify-sepia.vercel.app/preview)
+- **Download APK:** [Zappify Android App](https://expo.dev/accounts/devendra.mi/projects/zappify/builds/29e30585-c692-470b-b195-fd7af1822eb2)
+- **Preview App:** [Preview App](https://drive.google.com/file/d/1IDo1ueM5tcDFiFk4r-4q5vFa-vUeZcyl/view)
 
 ---
 
 ## Technology Stack
 
-### Web Frontend
-![React](https://img.shields.io/badge/React_19-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)
-![Framer Motion](https://img.shields.io/badge/Framer_Motion-0055FF?style=for-the-badge&logo=framer&logoColor=white)
-![CSS3](https://img.shields.io/badge/CSS3-1572B6?style=for-the-badge&logo=css3&logoColor=white)
-![Google OAuth](https://img.shields.io/badge/Google_OAuth-4285F4?style=for-the-badge&logo=google&logoColor=white)
-![Lucide React](https://img.shields.io/badge/Lucide_React-F56565?style=for-the-badge&logo=lucide&logoColor=white)
+### Frontend (Web)
+- **React 19** - Modern UI library with functional components
+- **Vite** - Fast build tool and dev server
+- **React Router** - Client-side routing
+- **Framer Motion** - Smooth animations
+- **Lucide React** - Beautiful icons
 
-### Mobile App
-![React Native](https://img.shields.io/badge/React_Native-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)
-![Expo](https://img.shields.io/badge/Expo-000020?style=for-the-badge&logo=expo&logoColor=white)
-![EAS Build](https://img.shields.io/badge/EAS_Build-4630EB?style=for-the-badge&logo=expo&logoColor=white)
-![AsyncStorage](https://img.shields.io/badge/AsyncStorage-FF6B35?style=for-the-badge&logo=react&logoColor=white)
-![React Navigation](https://img.shields.io/badge/React_Navigation-6B52AE?style=for-the-badge&logo=react&logoColor=white)
+### Frontend (Mobile)
+- **React Native** - Cross-platform mobile development
+- **Expo** - Development and build platform
+- **React Navigation** - Mobile navigation
 
 ### Backend
-![Node.js](https://img.shields.io/badge/Node.js-339933?style=for-the-badge&logo=nodedotjs&logoColor=white)
-![Express.js](https://img.shields.io/badge/Express.js-000000?style=for-the-badge&logo=express&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![Mongoose](https://img.shields.io/badge/Mongoose-880000?style=for-the-badge&logo=mongoose&logoColor=white)
-![JWT](https://img.shields.io/badge/JWT-000000?style=for-the-badge&logo=jsonwebtokens&logoColor=white)
-![Bcrypt](https://img.shields.io/badge/Bcrypt.js-003A70?style=for-the-badge&logo=letsencrypt&logoColor=white)
-![Helmet](https://img.shields.io/badge/Helmet-FF6B35?style=for-the-badge&logo=helmet&logoColor=white)
-![Morgan](https://img.shields.io/badge/Morgan-000000?style=for-the-badge&logo=npm&logoColor=white)
+- **Node.js & Express** - RESTful API server
+- **MongoDB & Mongoose** - Database and ODM
+- **JWT** - Authentication
+- **Bcrypt** - Password hashing
+- **Razorpay** - Payment gateway integration
 
-### Infrastructure
-![Vercel](https://img.shields.io/badge/Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-![GitHub Actions](https://img.shields.io/badge/GitHub_Actions-2088FF?style=for-the-badge&logo=githubactions&logoColor=white)
+### DevOps
+- **GitHub Actions** - CI/CD pipeline for automated linting
+- **Vercel** - Frontend and backend deployment
+- **ESLint** - Code quality and consistency
 
 ---
 
-## Architecture Diagram
+## System Architecture
 
+The application follows a three-tier architecture:
+
+1. **Frontend Layer** - React web app and React Native mobile app
+2. **Backend Layer** - Express.js REST API server
+3. **Database Layer** - MongoDB for data persistence
+
+**Data Flow:**
 ```
-+-------------------------------------------------------------------+
-|                                                                   |
-|  +-------------+      +-------------+      +-------------+       |
-|  |  Front-end  |      |  Back-end   |      |  Database   |       |
-|  |   ReactJS   |<---->|   NodeJS    |<---->|  MongoDB    |       |
-|  |UI Components|      |  ExpressJS  |      | Collections |       |
-|  | API calls   |      |API endpoints|      |  Documents  |       |
-|  +-------------+      +-------------+      +-------------+       |
-|                                                                   |
-+-------------------------------------------------------------------+
+User → Frontend (React/React Native) → API Calls → Backend (Express) → Database (MongoDB)
 ```
 
 ---
 
-## Database Schema
+## Database Models
 
-```mermaid
-erDiagram
-Users ||--o{ Orders : places
-Products ||--o{ Orders : included_in
+### User Model
+- Stores user credentials (email, hashed password)
+- Supports both email/password and Google OAuth login
+- Tracks user role (admin/customer)
 
-Users {
-  ObjectId _id PK
-  String name
-  String email UK
-  String password
-  Boolean isAdmin
-}
+### Product Model
+- Contains shoe details (name, brand, price, image, stock)
+- Categorized by type (Running, Casual, Sports, etc.)
+- Linked to user who created it
 
-Products {
-  ObjectId _id PK
-  ObjectId user FK
-  String name
-  String brand
-  String category
-  Number price
-  Number countInStock
-}
-
-Orders {
-  ObjectId _id PK
-  ObjectId user FK
-  Array orderItems
-  Object shippingAddress
-  String paymentMethod
-  Number totalPrice
-  Boolean isPaid
-  Boolean isDelivered
-}
-```
+### Order Model
+- Stores order details and items
+- Tracks shipping address and payment info
+- Maintains order status (paid, delivered)
 
 ---
 
-## What This Project Does
+## Key Features
 
-Zappify is built as a real-world e-commerce application that covers the complete shopping journey:
+### User Features
+- **Product Browsing:** View 44+ premium shoe listings with images and details
+- **Search & Filter:** Find shoes by brand, category, and price range
+- **Shopping Cart:** Add/remove items, update quantities
+- **Wishlist:** Save favorite products for later
+- **User Authentication:** 
+  - Email/Password registration and login
+  - Google OAuth 2.0 integration
+- **Checkout Process:** 
+  - Multi-step checkout (Cart → Address → Payment)
+  - Razorpay payment integration (Test mode)
+- **Order Management:** View order history and status
 
-- A user lands on the site, browses 44+ premium shoe listings
-- Filters by category, theme, or searches by name
-- Views product details with size chart and adds to cart
-- Logs in via email/password or Google OAuth
-- Goes through a 3-step checkout (Bag → Address → Payment)
-- Tracks their order with a live timeline
-- Can cancel an order with a reason
-- All of this works on both web and Android mobile app
+### Technical Features
+- **Responsive Design:** Works seamlessly on desktop, tablet, and mobile
+- **RESTful API:** Clean API endpoints for all operations
+- **JWT Authentication:** Secure token-based auth
+- **Password Security:** Bcrypt hashing for user passwords
+- **Code Quality:** ESLint for consistent code style
+- **CI/CD Pipeline:** Automated linting on every push/PR via GitHub Actions
 
 ---
 
-## Main Features
+## CI/CD Pipeline
 
-### For Users
-- Browse 44+ premium shoe listings
-- Filter by category and theme
-- Sort by price and new arrivals
-- Search products by name, brand or category
-- Product detail page with size selection and UK Size Chart
-- Add to cart with size validation
-- Wishlist toggle on product cards and detail page
-- 3-step checkout - Bag to Address to Payment (COD / UPI / Card)
-- Order history with tracking timeline
-- Order cancellation with reason selection form
-- Google OAuth 2.0 login
-- Normal email/password sign up and sign in
-- User-specific order history per account
-- Persistent login via localStorage / AsyncStorage
-- Full Android mobile app via Expo + EAS Build
+The project uses **GitHub Actions** for continuous integration:
 
-### For Admins
-- Secure JWT-protected API routes
-- Admin middleware for role-based access
-- Create and manage product listings via REST API
+**Workflow Triggers:**
+- On push to `main` branch
+- On pull requests to `main` branch
+
+**Pipeline Steps:**
+1. **Install Dependencies** - Installs npm packages for frontend and backend
+2. **Run Linter** - Checks code quality using ESLint
+
+This ensures code quality is maintained before merging any changes.
 
 ---
 
 ## Getting Started
 
-### What You Need
-- Node.js 18+
+### Prerequisites
+- Node.js (v18 or higher)
 - MongoDB (local or Atlas)
+- npm or yarn
 
 ### Installation
 
-1. Clone the repo
+1. **Clone the repository**
 ```bash
 git clone https://github.com/Mishra-coder/Zappify.git
 cd Zappify
 ```
 
-2. Backend setup
+2. **Backend Setup**
 ```bash
 cd backend
 npm install
 ```
 
-Create `backend/.env`:
+Create a `.env` file in the backend directory:
 ```env
-PORT=5001
-MONGO_URI=your_mongodb_uri
-JWT_SECRET=your_secret_key
-NODE_ENV=development
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+RAZORPAY_KEY_ID=your_razorpay_key
+RAZORPAY_KEY_SECRET=your_razorpay_secret
 ```
 
+Start the backend server:
 ```bash
 npm run dev
 ```
 
-3. Frontend setup
+3. **Frontend Setup**
 ```bash
 cd frontend
 npm install
+```
+
+Create a `.env` file in the frontend directory:
+```env
+VITE_API_URL=http://localhost:5000
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
+
+Start the frontend:
+```bash
 npm run dev
 ```
 
-4. Mobile setup
+4. **Mobile Setup**
 ```bash
 cd mobile
 npm install
 npx expo start
 ```
 
-App opens at http://localhost:5173
+Scan the QR code with Expo Go app on your Android device.
 
 ---
 
@@ -196,60 +186,126 @@ App opens at http://localhost:5173
 
 ```
 Zappify/
-├── .github/workflows/
-├── frontend/
-│   ├── public/shoes/
-│   └── src/
-│       ├── components/
-│       ├── data/products.js
-│       ├── App.jsx
-│       ├── Preview.jsx
-│       ├── main.jsx
-│       └── index.css
-├── mobile/
+├── .github/
+│   └── workflows/
+│       └── ci.yml           # GitHub Actions CI pipeline
+├── frontend/                # React Web Application
 │   ├── src/
-│   │   ├── components/
-│   │   ├── context/
-│   │   ├── data/
-│   │   ├── screens/
-│   │   └── theme/
-│   └── App.js
-└── backend/
-    ├── config/db.js
-    ├── controllers/
-    ├── middlewares/
-    ├── models/
-    ├── routes/
-    └── server.js
+│   │   ├── components/      # Reusable UI components
+│   │   ├── data/            # Static product data
+│   │   └── App.jsx          # Main app component
+│   ├── public/              # Static assets
+│   └── package.json
+├── backend/                 # Node.js/Express API
+│   ├── config/              # Database configuration
+│   ├── controllers/         # Request handlers
+│   ├── middlewares/         # Auth and validation middleware
+│   ├── models/              # MongoDB schemas
+│   ├── routes/              # API routes
+│   ├── utils/               # Helper functions
+│   └── server.js            # Entry point
+└── mobile/                  # React Native Mobile App
+    ├── src/
+    │   ├── components/      # Mobile UI components
+    │   ├── screens/         # App screens
+    │   ├── context/         # State management
+    │   └── data/            # Product data
+    └── App.js               # Main app component
 ```
 
 ---
 
 ## API Endpoints
 
-| Method | Endpoint | Description | Auth |
-|---|---|---|---|
-| POST | /api/users | Register user | No |
-| POST | /api/users/login | Login user | No |
-| GET | /api/products | Get all products | No |
-| GET | /api/products/:id | Get product by ID | No |
-| POST | /api/products | Create product | Admin |
+### Authentication
+- `POST /api/users/register` - Register new user
+- `POST /api/users/login` - Login user
+- `POST /api/users/google` - Google OAuth login
+
+### Products
+- `GET /api/products` - Get all products
+- `GET /api/products/:id` - Get single product
+
+### Orders
+- `POST /api/orders` - Create new order
+- `GET /api/orders/:id` - Get order details
+- `GET /api/orders/user/:userId` - Get user's orders
 
 ---
 
-## Docker
+## Design Decisions
 
-```bash
-docker build -t zappify-backend ./backend
-docker run -p 5001:5001 zappify-backend
-```
+### Why MERN Stack?
+- **MongoDB:** Flexible schema for product variations
+- **Express:** Lightweight and fast API development
+- **React:** Component reusability across web and mobile
+- **Node.js:** JavaScript everywhere, easy to maintain
+
+### Why React Native?
+- Code sharing between web and mobile
+- Faster development with Expo
+- Native performance with JavaScript
+
+### Why Vite?
+- Lightning-fast HMR (Hot Module Replacement)
+- Optimized production builds
+- Better developer experience than CRA
+
+### Authentication Strategy
+- JWT for stateless authentication
+- Google OAuth for better user experience
+- Bcrypt for secure password storage
+
+---
+
+## Challenges Faced
+
+1. **State Management Across Platforms**
+   - Solution: Used React Context API for simple, shared state management
+
+2. **Payment Integration**
+   - Solution: Integrated Razorpay with proper error handling and test mode
+
+3. **Image Optimization**
+   - Solution: Compressed images and used lazy loading for better performance
+
+4. **Mobile Responsiveness**
+   - Solution: Used Flexbox and responsive units for consistent UI
+
+5. **API Security**
+   - Solution: Implemented JWT middleware and input validation
+
+---
+
+## Future Enhancements
+
+- Add product reviews and ratings
+- Implement real-time order tracking
+- Add admin dashboard for inventory management
+- Integrate more payment gateways
+- Add push notifications for mobile app
+- Implement advanced search with filters
+
+---
+
+## Contributing
+
+Contributions are welcome! Please feel free to submit a Pull Request.
+
+---
+
+## License
+
+This project is open source and available under the MIT License.
 
 ---
 
 ## Author
 
-Devendra Mishra - [@Mishra-coder](https://github.com/Mishra-coder)
+**Devendra Mishra**
+- GitHub: [@Mishra-coder](https://github.com/Mishra-coder)
+- Project Link: [https://github.com/Mishra-coder/Zappify](https://github.com/Mishra-coder/Zappify)
 
 ---
 
-Built with love for Zappify Shoes
+<p align="center">Built with ❤️ for Zappify Shoes</p>

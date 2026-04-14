@@ -1,4 +1,3 @@
-import React from 'react';
 import { View, Text, FlatList, Image, TouchableOpacity, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -37,7 +36,7 @@ export default function WishlistScreen({ navigation }) {
         contentContainerStyle={styles.list}
         renderItem={({ item }) => (
           <TouchableOpacity style={styles.item} onPress={() => navigation.navigate('ProductDetail', { product: item })} activeOpacity={0.9}>
-            <Image source={{ uri: item.image }} style={styles.itemImg} resizeMode="cover" />
+            <Image source={typeof item.image === 'string' ? { uri: item.image } : item.image} style={styles.itemImg} resizeMode="cover" />
             <View style={styles.itemInfo}>
               <Text style={styles.itemBrand}>{item.brand}</Text>
               <Text style={styles.itemName} numberOfLines={2}>{item.name}</Text>

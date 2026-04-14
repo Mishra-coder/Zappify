@@ -1,24 +1,18 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { ChevronDown, Filter } from 'lucide-react';
 
 const categories = [
-  'Men Low Top Sneakers',
-  'Men High Top Sneakers',
-  'Men Mid Top Sneakers',
-  'Men Mules',
-  'Men Clogs'
+  'Running',
+  'Lifestyle',
+  'Basketball',
+  'Training & Gym',
+  'Jordan',
+  'Skateboarding',
+  'Walking',
 ];
 
-const themes = [
-  'Urban Tech',
-  'Retro Classic',
-  'Cyber Sport',
-  'Minimalist'
-];
-
-const Sidebar = ({ selectedCategories, selectedThemes, onToggleFilter }) => {
+const Sidebar = ({ selectedCategories, onToggleFilter }) => {
   const [isCategoriesOpen, setIsCategoriesOpen] = useState(true);
-  const [isThemesOpen, setIsThemesOpen] = useState(true);
 
   return (
     <aside className="sidebar">
@@ -28,14 +22,14 @@ const Sidebar = ({ selectedCategories, selectedThemes, onToggleFilter }) => {
       </div>
 
       <div className="filter-section">
-        <div 
-          className="section-title" 
+        <div
+          className="section-title"
           onClick={() => setIsCategoriesOpen(!isCategoriesOpen)}
         >
           <h4>CATEGORIES</h4>
-          <ChevronDown 
-            size={18} 
-            style={{ transform: isCategoriesOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: '0.3s' }} 
+          <ChevronDown
+            size={18}
+            style={{ transform: isCategoriesOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: '0.3s' }}
           />
         </div>
         {isCategoriesOpen && (
@@ -43,8 +37,8 @@ const Sidebar = ({ selectedCategories, selectedThemes, onToggleFilter }) => {
             {categories.map((cat, i) => (
               <li key={i} className="filter-item">
                 <label>
-                  <input 
-                    type="checkbox" 
+                  <input
+                    type="checkbox"
                     checked={selectedCategories.includes(cat)}
                     onChange={() => onToggleFilter(cat, 'category')}
                   />
@@ -56,38 +50,7 @@ const Sidebar = ({ selectedCategories, selectedThemes, onToggleFilter }) => {
           </ul>
         )}
       </div>
-
-      <div className="filter-section">
-        <div 
-          className="section-title" 
-          onClick={() => setIsThemesOpen(!isThemesOpen)}
-        >
-          <h4>THEMES</h4>
-          <ChevronDown 
-            size={18} 
-            style={{ transform: isThemesOpen ? 'rotate(0deg)' : 'rotate(-90deg)', transition: '0.3s' }} 
-          />
-        </div>
-        {isThemesOpen && (
-          <ul className="filter-list">
-            {themes.map((theme, i) => (
-              <li key={i} className="filter-item">
-                <label>
-                  <input 
-                    type="checkbox" 
-                    checked={selectedThemes.includes(theme)}
-                    onChange={() => onToggleFilter(theme, 'theme')}
-                  />
-                  <span className="checkbox-custom"></span>
-                  <span className="item-name">{theme}</span>
-                </label>
-              </li>
-            ))}
-          </ul>
-        )}
-      </div>
-
-      </aside>
+    </aside>
   );
 };
 

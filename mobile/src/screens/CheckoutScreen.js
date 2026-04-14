@@ -1,9 +1,19 @@
-import React, { useState } from 'react';
+import { useState, Fragment } from 'react';
 import { View, Text, ScrollView, TouchableOpacity, TextInput, StyleSheet, Alert } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { colors } from '../theme/colors';
 import { useApp } from '../context/AppContext';
+
+let RazorpayCheckout = null;
+try {
+  RazorpayCheckout = require('react-native-razorpay').default;
+} catch (e) {
+  RazorpayCheckout = null;
+}
+
+const API_URL = 'https://zappify-dz5a.vercel.app';
+const RAZORPAY_KEY_ID = 'rzp_test_SZtLthHdKYuLeQ';
 
 const STEPS = ['MY BAG', 'ADDRESS', 'PAYMENT'];
 const PAYMENT_OPTIONS = [
@@ -21,8 +31,59 @@ export default function CheckoutScreen({ navigation }) {
   const shipping = cartTotal > 999 ? 0 : 99;
 
   const handlePlaceOrder = async () => {
-    await placeOrder(cartItems);
-    setDone(true);
+    if (payment === 'cod') {
+      await placeOrder(cartItems);
+      setDone(true);
+      return;
+    }
+    if (!RazorpayCheckout) {
+      Alert.alert('Not Available', 'Payment via card/UPI requires the full app build. Please use Cash on Delivery.');
+      return;
+    }
+
+    try {
+      const res = await fetch(`${API_URL}/api/payment/create-order`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ amount: cartTotal + shipping }),
+      });
+      const data = await res.json();
+
+      const options = {
+        description: 'Shoe Purchase',
+        image: 'https://zappify-sepia.vercel.app/logo.png',
+        currency: 'INR',
+        key: RAZORPAY_KEY_ID,
+        amount: data.amount,
+        order_id: data.orderId,
+        name: 'Zappify',
+        prefill: { contact: address.phone, name: address.name },
+        theme: { color: '#D83100' },
+      };
+
+      RazorpayCheckout.open(options)
+        .then(async (response) => {
+          const verifyRes = await fetch(`${API_URL}/api/payment/verify`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(response),
+          });
+          const verifyData = await verifyRes.json();
+          if (verifyData.success) {
+            await placeOrder(cartItems);
+            setDone(true);
+          } else {
+            Alert.alert('Failed', 'Payment verification failed.');
+          }
+        })
+        .catch((error) => {
+          if (error.code !== 'PAYMENT_CANCELLED') {
+            Alert.alert('Payment Failed', error.description || 'Something went wrong.');
+          }
+        });
+    } catch {
+      Alert.alert('Error', 'Could not connect to server. Is backend running?');
+    }
   };
 
   if (done) {
@@ -48,7 +109,7 @@ export default function CheckoutScreen({ navigation }) {
 
       <View style={styles.stepsRow}>
         {STEPS.map((s, i) => (
-          <React.Fragment key={s}>
+          <Fragment key={s}>
             <View style={styles.stepItem}>
               <View style={[styles.stepCircle, i <= step && styles.stepCircleActive, i < step && styles.stepCircleDone]}>
                 {i < step
@@ -59,7 +120,7 @@ export default function CheckoutScreen({ navigation }) {
               <Text style={[styles.stepLabel, i <= step && styles.stepLabelActive]}>{s}</Text>
             </View>
             {i < STEPS.length - 1 && <View style={[styles.stepLine, i < step && styles.stepLineDone]} />}
-          </React.Fragment>
+          </Fragment>
         ))}
       </View>
 
@@ -91,14 +152,14 @@ export default function CheckoutScreen({ navigation }) {
           <View>
             <Text style={styles.sectionTitle}>DELIVERY ADDRESS</Text>
             <View style={styles.formRow}>
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Full Name *" value={address.name} onChangeText={v => setAddress({ ...address, name: v })} />
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Phone *" value={address.phone} onChangeText={v => setAddress({ ...address, phone: v })} keyboardType="phone-pad" />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Full Name *" placeholderTextColor={colors.gray} value={address.name} onChangeText={v => setAddress({ ...address, name: v })} />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Phone *" placeholderTextColor={colors.gray} value={address.phone} onChangeText={v => setAddress({ ...address, phone: v })} keyboardType="phone-pad" />
             </View>
-            <TextInput style={styles.input} placeholder="Street Address *" value={address.street} onChangeText={v => setAddress({ ...address, street: v })} />
+            <TextInput style={styles.input} placeholder="Street Address *" placeholderTextColor={colors.gray} value={address.street} onChangeText={v => setAddress({ ...address, street: v })} />
             <View style={styles.formRow}>
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Pincode *" value={address.pincode} onChangeText={v => setAddress({ ...address, pincode: v })} keyboardType="numeric" />
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="City *" value={address.city} onChangeText={v => setAddress({ ...address, city: v })} />
-              <TextInput style={[styles.input, { flex: 1 }]} placeholder="State *" value={address.state} onChangeText={v => setAddress({ ...address, state: v })} />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="Pincode *" placeholderTextColor={colors.gray} value={address.pincode} onChangeText={v => setAddress({ ...address, pincode: v })} keyboardType="numeric" />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="City *" placeholderTextColor={colors.gray} value={address.city} onChangeText={v => setAddress({ ...address, city: v })} />
+              <TextInput style={[styles.input, { flex: 1 }]} placeholder="State *" placeholderTextColor={colors.gray} value={address.state} onChangeText={v => setAddress({ ...address, state: v })} />
             </View>
             <View style={styles.btnRow}>
               <TouchableOpacity style={styles.backBtn} onPress={() => setStep(0)}><Text style={styles.backTxt}>BACK</Text></TouchableOpacity>
@@ -148,15 +209,14 @@ const styles = StyleSheet.create({
   title: { fontSize: 16, fontWeight: '800', letterSpacing: 1.5, color: colors.dark },
   stepsRow: { flexDirection: 'row', alignItems: 'center', paddingHorizontal: 20, paddingVertical: 16 },
   stepItem: { alignItems: 'center', gap: 4 },
-  stepCircle: { width: 28, height: 28, borderRadius: 14, borderWidth: 2, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
-  stepCircleActive: { borderColor: colors.brand },
-  stepCircleDone: { backgroundColor: colors.brand, borderColor: colors.brand },
+  stepCircleDone: { backgroundColor: '#D83100', borderColor: '#D83100' },
+  stepCircleActive: { borderColor: '#D83100' },
   stepNum: { fontSize: 12, fontWeight: '700', color: colors.gray },
-  stepNumActive: { color: colors.brand },
+  stepNumActive: { color: '#D83100' },
   stepLabel: { fontSize: 10, fontWeight: '700', color: colors.gray, letterSpacing: 0.5 },
-  stepLabelActive: { color: colors.brand },
+  stepLabelActive: { color: '#D83100' },
   stepLine: { flex: 1, height: 2, backgroundColor: colors.border, marginBottom: 16 },
-  stepLineDone: { backgroundColor: colors.brand },
+  stepLineDone: { backgroundColor: '#D83100' },
   body: { padding: 20, paddingBottom: 40 },
   bagItem: { flexDirection: 'row', justifyContent: 'space-between', paddingVertical: 12, borderBottomWidth: 1, borderBottomColor: colors.border },
   bagInfo: { flex: 1 },
@@ -170,7 +230,7 @@ const styles = StyleSheet.create({
   totalRow: { paddingTop: 8, borderTopWidth: 1, borderTopColor: colors.border, marginTop: 4 },
   totalLabel: { fontSize: 15, fontWeight: '800', color: colors.dark },
   totalVal: { fontSize: 16, fontWeight: '900', color: colors.dark },
-  nextBtn: { flex: 1, backgroundColor: colors.brand, borderRadius: 12, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
+  nextBtn: { flex: 1, backgroundColor: '#D83100', borderRadius: 12, paddingVertical: 14, flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 6 },
   nextTxt: { color: colors.white, fontWeight: '800', fontSize: 13, letterSpacing: 0.5 },
   btnRow: { flexDirection: 'row', gap: 10, marginTop: 8 },
   backBtn: { paddingHorizontal: 20, paddingVertical: 14, borderRadius: 12, borderWidth: 1.5, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
@@ -179,15 +239,15 @@ const styles = StyleSheet.create({
   formRow: { flexDirection: 'row', gap: 10 },
   input: { borderWidth: 1.5, borderColor: colors.border, borderRadius: 10, paddingHorizontal: 14, paddingVertical: 12, fontSize: 14, color: colors.dark, marginBottom: 12 },
   payOption: { flexDirection: 'row', alignItems: 'center', gap: 12, padding: 14, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, marginBottom: 10 },
-  payOptionActive: { borderColor: colors.brand, backgroundColor: colors.brandLight },
+  payOptionActive: { borderColor: '#D83100', backgroundColor: 'rgba(216,49,0,0.06)' },
   radio: { width: 18, height: 18, borderRadius: 9, borderWidth: 2, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
-  radioActive: { borderColor: colors.brand },
-  radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.brand },
+  radioActive: { borderColor: '#D83100' },
+  radioDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: '#D83100' },
   payLabel: { fontSize: 14, fontWeight: '500', color: colors.dark },
   successBox: { flex: 1, alignItems: 'center', justifyContent: 'center', padding: 32, gap: 16 },
-  successIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: colors.brand, alignItems: 'center', justifyContent: 'center' },
+  successIcon: { width: 72, height: 72, borderRadius: 36, backgroundColor: '#D83100', alignItems: 'center', justifyContent: 'center' },
   successTitle: { fontSize: 24, fontWeight: '800', color: colors.dark },
   successMsg: { fontSize: 14, color: colors.gray, textAlign: 'center', lineHeight: 22 },
-  continueBtn: { backgroundColor: colors.brand, paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginTop: 8 },
+  continueBtn: { backgroundColor: '#D83100', paddingHorizontal: 32, paddingVertical: 14, borderRadius: 12, marginTop: 8 },
   continueTxt: { color: colors.white, fontWeight: '800', fontSize: 14, letterSpacing: 1 },
 });

@@ -1,24 +1,25 @@
 import { useState, useMemo } from 'react'
 import Header from './components/Header'
+import Sidebar from './components/Sidebar'
 import ProductGrid from './components/ProductGrid'
 import ProductDetail from './components/ProductDetail'
 import { ALL_PRODUCTS } from './data/products'
 import { motion, AnimatePresence } from 'framer-motion'
-import { X, ShoppingBag, Heart, User, Trash2 } from 'lucide-react'
+import { X, ShoppingBag, Heart, Trash2 } from 'lucide-react'
 import { useGoogleLogin } from '@react-oauth/google'
 import Checkout from './components/Checkout'
 import AccountModal from './components/AccountModal'
-
-const CATEGORIES = ['All', 'Men Low Top Sneakers', 'Men High Top Sneakers', 'Men Mid Top Sneakers', 'Men Clogs', 'Men Slip-ons'];
 
 function App() {
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [selectedProduct, setSelectedProduct] = useState(null);
   const [activeOverlay, setActiveOverlay] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeNav, setActiveNav] = useState('ALL');
   const [sneakersView, setSneakersView] = useState(false);
   const [showCheckout, setShowCheckout] = useState(false);
   const [showAccount, setShowAccount] = useState(false);
+  const [showNikeBanner, setShowNikeBanner] = useState(false);
 
   const [cartItems, setCartItems] = useState(() => {
     try { return JSON.parse(localStorage.getItem('zappify_cart')) || []; } catch { return []; }
@@ -55,10 +56,23 @@ function App() {
     setPlacedOrders([]);
   };
 
+  const toggleFilter = (item, type) => {
+    if (type === 'category') {
+      if (selectedCategories.includes(item)) {
+        setSelectedCategories(selectedCategories.filter(i => i !== item));
+      } else {
+        setSelectedCategories([...selectedCategories, item]);
+      }
+    }
+  };
+
   const handleNavigate = (destination) => {
     setSelectedProduct(null);
     setSelectedCategories([]);
+    setShowNikeBanner(false);
     setSneakersView(destination === 'SNEAKERS');
+    if (destination !== 'home') setActiveNav(destination);
+    else setActiveNav('ALL');
   };
 
   const addToCart = (product, size) => {
@@ -93,145 +107,200 @@ function App() {
   const isWishlisted = (id) => wishlistItems.some(i => i.id === id);
 
   const filteredProducts = useMemo(() => {
-    return ALL_PRODUCTS.filter(product => {
-      const sneakerMatch = sneakersView ? product.id >= 30 && product.id <= 44 : true;
-      const categoryMatch = selectedCategories.length === 0 || selectedCategories.includes(product.category);
-      const searchMatch = searchQuery.trim() === '' ||
-        product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        product.category.toLowerCase().includes(searchQuery.toLowerCase());
-      return sneakerMatch && categoryMatch && searchMatch;
-    });
-  }, [selectedCategories, sneakersView, searchQuery]);
+    const searchMatch = (product) =>
+      searchQuery.trim() === '' ||
+      product.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.brand.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      product.category.toLowerCase().includes(searchQuery.toLowerCase());
+
+    const categoryMatch = (product) =>
+      selectedCategories.length === 0 || selectedCategories.includes(product.category);
+
+    if (showNikeBanner) {
+      return ALL_PRODUCTS.filter(p => p.brand === 'NIKE' && !p.gender && searchMatch(p));
+    }
+
+    if (activeNav === 'MEN') {
+      const menProducts = ALL_PRODUCTS.filter(p =>
+        p.gender === 'MEN' && searchMatch(p) && categoryMatch(p)
+      );
+      const nikeOriginal = ALL_PRODUCTS.filter(p =>
+        !p.gender && searchMatch(p) && categoryMatch(p)
+      );
+      return [...menProducts, ...nikeOriginal];
+    }
+
+    if (activeNav === 'SNEAKERS' || sneakersView) {
+      return ALL_PRODUCTS.filter(p =>
+        p.brand === 'NIKE' && !p.gender && searchMatch(p) && categoryMatch(p)
+      );
+    }
+
+    return ALL_PRODUCTS.filter(p =>
+      searchMatch(p) && categoryMatch(p)
+    );
+  }, [selectedCategories, sneakersView, searchQuery, activeNav, showNikeBanner]);
+
 
   return (
-    <div className="zappify-app">
-      <Header
-        onOpenOverlay={setActiveOverlay}
-        onNavigate={handleNavigate}
-        cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
-        wishlistCount={wishlistItems.length}
-        loggedInUser={loggedInUser}
-        onOpenAccount={() => setShowAccount(true)}
-        searchQuery={searchQuery}
-        onSearch={setSearchQuery}
-      />
+    <AnimatePresence mode="wait">
+      <motion.div 
+          key="app-content"
+          className="zappify-app"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          <Header
+            onOpenOverlay={setActiveOverlay}
+            onNavigate={handleNavigate}
+            cartCount={cartItems.reduce((sum, i) => sum + i.qty, 0)}
+            wishlistCount={wishlistItems.length}
+            activeNav={activeNav}
+            loggedInUser={loggedInUser}
+            onOpenAccount={() => setShowAccount(true)}
+            searchQuery={searchQuery}
+            onSearch={(q) => { setSearchQuery(q); if (!q) setShowNikeBanner(false); }}
+          />
 
-      <main className="app-main">
-        <div className="container-broad main-layout">
-          <AnimatePresence mode="wait">
-            {!selectedProduct ? (
-              <motion.div
-                key="grid"
-                className="grid-view"
-                initial={{ opacity: 0, x: -20 }}
-                animate={{ opacity: 1, x: 0 }}
-                exit={{ opacity: 0, x: -20 }}
-                transition={{ duration: 0.3 }}
-              >
-                <div className="category-chips">
-                  {CATEGORIES.map(cat => (
-                    <button
-                      key={cat}
-                      className={`cat-chip ${selectedCategories.length === 0 && cat === 'All' ? 'active' : selectedCategories.includes(cat) ? 'active' : ''}`}
-                      onClick={() => cat === 'All'
-                        ? setSelectedCategories([])
-                        : setSelectedCategories(prev => prev.includes(cat) ? prev.filter(c => c !== cat) : [...prev, cat])
-                      }
+          <main className="app-main">
+            <AnimatePresence mode="wait">
+              <div className="container-broad main-layout">
+                <AnimatePresence mode="wait">
+                  {!selectedProduct ? (
+                    <motion.div
+                      key="grid"
+                      className="grid-view"
+                      initial={{ opacity: 0, x: -20 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      exit={{ opacity: 0, x: -20 }}
+                      transition={{ duration: 0.3 }}
                     >
-                      {cat}
-                    </button>
-                  ))}
-                </div>
-                <ProductGrid
-                  products={filteredProducts}
-                  onProductClick={setSelectedProduct}
-                  onToggleWishlist={toggleWishlist}
-                  isWishlisted={isWishlisted}
-                />
-              </motion.div>
-            ) : (
-              <motion.div
-                key="detail"
-                className="detail-view"
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
-              >
-                <ProductDetail
-                  product={selectedProduct}
-                  onBack={() => setSelectedProduct(null)}
-                  onAddToCart={addToCart}
-                  onToggleWishlist={toggleWishlist}
-                  isWishlisted={isWishlisted(selectedProduct.id)}
-                />
-              </motion.div>
+                      <div className="layout-split">
+                        <Sidebar
+                          selectedCategories={selectedCategories}
+                          onToggleFilter={toggleFilter}
+                        />
+                        <div className="content-area">
+                          {!searchQuery && !selectedCategories.length && (
+                            <HeroBanner onExplore={() => {
+                              setShowNikeBanner(true);
+                              setSearchQuery('Nike');
+                            }} />
+                          )}
+                          {showNikeBanner && (
+                            <div className="nike-info-banner">
+                              <div className="nike-banner-content">
+                                <p className="nike-banner-tag">SPRING COLLECTION 2026</p>
+                                <h2 className="nike-banner-title">20 Iconic<br />Nike Shoes</h2>
+                                <p className="nike-banner-sub">Handpicked for you — the finest kicks from Nike's latest lineup.</p>
+                                <div className="nike-banner-stats">
+                                  <div className="nike-stat"><span className="nike-stat-num">20</span><span className="nike-stat-label">Products</span></div>
+                                  <div className="nike-stat-divider" />
+                                  <div className="nike-stat"><span className="nike-stat-num">7</span><span className="nike-stat-label">Categories</span></div>
+                                  <div className="nike-stat-divider" />
+                                  <div className="nike-stat"><span className="nike-stat-num">2026</span><span className="nike-stat-label">Collection</span></div>
+                                </div>
+                                <button className="nike-banner-btn" onClick={() => { setShowNikeBanner(false); setSearchQuery(''); }}>← Back to All</button>
+                              </div>
+                              <div className="nike-banner-img">
+                                <img src="/hero-nike.png" alt="Nike" />
+                              </div>
+                            </div>
+                          )}
+                          <ProductGrid
+                            products={filteredProducts}
+                            onProductClick={(product) => { setSelectedProduct(product); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+                            onToggleWishlist={toggleWishlist}
+                            isWishlisted={isWishlisted}
+                          />
+                        </div>
+                      </div>
+                    </motion.div>
+                  ) : (
+                    <motion.div
+                      key="detail"
+                      className="detail-view"
+                      initial={{ opacity: 0, y: 20 }}
+                      animate={{ opacity: 1, y: 0 }}
+                      exit={{ opacity: 0, y: -20 }}
+                      transition={{ duration: 0.4 }}
+                    >
+                      <ProductDetail
+                        product={selectedProduct}
+                        onBack={() => setSelectedProduct(null)}
+                        onAddToCart={addToCart}
+                        onToggleWishlist={toggleWishlist}
+                        isWishlisted={isWishlisted(selectedProduct.id)}
+                      />
+                    </motion.div>
+                  )}
+                </AnimatePresence>
+              </div>
+            </AnimatePresence>
+          </main>
+
+          <footer className="zappify-footer">
+            <div className="container-broad">
+              <div className="footer-bottom">
+                <p>&copy; 2026 Zappify Shoe Store. All rights reserved.</p>
+              </div>
+            </div>
+          </footer>
+
+          <AnimatePresence>
+            {activeOverlay && (
+              <Overlay
+                type={activeOverlay}
+                onClose={() => setActiveOverlay(null)}
+                cartItems={cartItems}
+                wishlistItems={wishlistItems}
+                onRemoveFromCart={removeFromCart}
+                onToggleWishlist={toggleWishlist}
+                onLoginSuccess={handleLogin}
+                onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
+                loggedInUser={loggedInUser}
+                onSwitchOverlay={setActiveOverlay}
+              />
             )}
           </AnimatePresence>
-        </div>
-      </main>
 
-      <footer className="zappify-footer">
-        <div className="container-broad">
-          <div className="footer-bottom">
-            <p>&copy; 2026 Zappify Shoe Store. All rights reserved.</p>
-          </div>
-        </div>
-      </footer>
+          {showCheckout && (
+            <Checkout
+              cartItems={cartItems}
+              onClose={() => setShowCheckout(false)}
+              onRemoveFromCart={removeFromCart}
+              onOrderPlaced={(items) => {
+                const newOrders = items.map(item => ({
+                  ...item,
+                  orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
+                  placedAt: new Date().toISOString(),
+                  status: 'Placed',
+                }));
+                const updated = [...placedOrders, ...newOrders];
+                setPlacedOrders(updated);
+                localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
+                setCartItems([]);
+                localStorage.removeItem('zappify_cart');
+              }}
+            />
+          )}
 
-      <AnimatePresence>
-        {activeOverlay && (
-          <Overlay
-            type={activeOverlay}
-            onClose={() => setActiveOverlay(null)}
-            cartItems={cartItems}
-            wishlistItems={wishlistItems}
-            onRemoveFromCart={removeFromCart}
-            onToggleWishlist={toggleWishlist}
-            onLoginSuccess={handleLogin}
-            onCheckout={() => { setActiveOverlay(null); setShowCheckout(true); }}
-            loggedInUser={loggedInUser}
-            onSwitchOverlay={setActiveOverlay}
-          />
-        )}
-      </AnimatePresence>
-
-      {showCheckout && (
-        <Checkout
-          cartItems={cartItems}
-          onClose={() => setShowCheckout(false)}
-          onRemoveFromCart={removeFromCart}
-          onOrderPlaced={(items) => {
-            const newOrders = items.map(item => ({
-              ...item,
-              orderId: Math.floor(10000000 + Math.random() * 90000000).toString(),
-              placedAt: new Date().toISOString(),
-              status: 'Placed',
-            }));
-            const updated = [...placedOrders, ...newOrders];
-            setPlacedOrders(updated);
-            localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
-            setCartItems([]);
-            localStorage.removeItem('zappify_cart');
-          }}
-        />
-      )}
-
-      {showAccount && loggedInUser && (
-        <AccountModal
-          user={loggedInUser}
-          orders={placedOrders}
-          onClose={() => setShowAccount(false)}
-          onLogout={() => { handleLogout(); setShowAccount(false); }}
-          onCancelOrder={(orderId) => {
-            const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
-            setPlacedOrders(updated);
-            localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
-          }}
-        />
-      )}
-    </div>
+          {showAccount && loggedInUser && (
+            <AccountModal
+              user={loggedInUser}
+              orders={placedOrders}
+              onClose={() => setShowAccount(false)}
+              onLogout={() => { handleLogout(); setShowAccount(false); }}
+              onCancelOrder={(orderId) => {
+                const updated = placedOrders.map(o => o.orderId === orderId ? { ...o, status: 'Cancelled' } : o);
+                setPlacedOrders(updated);
+                localStorage.setItem(userOrdersKey(loggedInUser), JSON.stringify(updated));
+              }}
+            />
+          )}
+        </motion.div>
+    </AnimatePresence>
   );
 }
 
@@ -268,7 +337,7 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
       const user = {
         name: formData.name,
         email: formData.email,
-        picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=e85d04&color=fff`,
+        picture: `https://ui-avatars.com/api/?name=${encodeURIComponent(formData.name)}&background=E85D04&color=fff`,
       };
       onLoginSuccess(user);
       onClose();
@@ -363,15 +432,19 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
           </div>
         </motion.div>
       ) : (
-        <motion.div className="modal" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}>
-          <div className="modal-header">
-            <button className="close-btn" onClick={onClose}><X size={24} /></button>
+        <motion.div className="modal login-modal-new" initial={{ opacity: 0, scale: 0.9, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.9, y: 20 }}>
+          <div className="login-hero-banner">
+            <img src="/hero-nike.png" alt="Nike" className="login-hero-img" />
+            <button className="close-btn login-close-btn" onClick={onClose}><X size={20} /></button>
+            <div className="login-hero-overlay">
+              <p className="login-hero-tag">ZAPPIFY</p>
+              <h2 className="login-hero-title">Premium<br />Footwear</h2>
+              <p className="login-hero-sub">Step into the future</p>
+            </div>
           </div>
-          <div className="modal-content login-modal">
-            <User size={48} className="user-icon-large" />
+          <div className="login-form-card">
             <h2>{isSignUp ? 'Create Account' : 'Welcome Back'}</h2>
             <p>{isSignUp ? 'Join Zappify today' : 'Login to your Zappify account'}</p>
-
             <div className="auth-form">
               {isSignUp && <input type="text" placeholder="Full Name" value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} />}
               <input type="email" placeholder="Email Address" value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} />
@@ -379,13 +452,12 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
               {isSignUp && <input type="password" placeholder="Confirm Password" value={formData.confirm} onChange={e => setFormData({ ...formData, confirm: e.target.value })} />}
               {error && <p className="auth-error">{error}</p>}
               <button className="btn-primary auth-btn" onClick={handleAuth}>{isSignUp ? 'CREATE ACCOUNT' : 'SIGN IN'}</button>
-              <div className="separator"><span>OR CONTINUE WITH</span></div>
-              <button className="google-custom-btn" onClick={() => googleLogin()}>
-                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" width="20" height="20" />
-                {isSignUp ? 'Sign up with Google' : 'Sign in with Google'}
+              <div className="separator"><span>OR</span></div>
+              <button className="google-proper-btn" onClick={() => googleLogin()}>
+                <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" className="google-icon-large" />
+                <span>{isSignUp ? 'Sign up with Google' : 'Sign in with Google'}</span>
               </button>
             </div>
-
             <p className="auth-footer">
               {isSignUp ? 'Already have an account? ' : "Don't have an account? "}
               <span onClick={() => setIsSignUp(!isSignUp)}>{isSignUp ? 'Sign In' : 'Sign Up'}</span>
@@ -396,5 +468,54 @@ const Overlay = ({ type, onClose, cartItems, wishlistItems, onRemoveFromCart, on
     </div>
   );
 };
+
+const HeroBanner = ({ onExplore }) => (
+  <motion.section 
+    className="hero-banner"
+    initial={{ opacity: 0, y: 15 }}
+    animate={{ opacity: 1, y: 0 }}
+    transition={{ duration: 0.7, ease: [0.22, 1, 0.36, 1] }}
+  >
+    <div className="hero-content">
+      <motion.p 
+        className="hero-tag"
+        initial={{ opacity: 0, x: -15 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ delay: 0.3 }}
+      >
+        SPRING COLLECTION 2026
+      </motion.p>
+      <motion.h1
+        initial={{ opacity: 0, y: 25 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ delay: 0.5 }}
+      >
+        Experience The Future <br /> Of Streetwear
+      </motion.h1>
+      <motion.p 
+        className="hero-subtitle"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.7 }}
+      >
+        Unmatched comfort. Uncompromising style. Crafted for those who move.
+      </motion.p>
+      <motion.button 
+        className="btn-primary hero-cta"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 0.9 }}
+        whileHover={{ scale: 1.05, boxShadow: '0 20px 40px rgba(255, 107, 0, 0.3)' }}
+        whileTap={{ scale: 0.95 }}
+        onClick={onExplore}
+      >
+        EXPLORE NOW
+      </motion.button>
+    </div>
+    <div className="hero-image-box">
+      <img src="/hero-nike.png" alt="Hero Shoe" />
+    </div>
+  </motion.section>
+);
 
 export default App;
