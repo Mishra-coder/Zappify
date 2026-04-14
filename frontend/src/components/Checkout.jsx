@@ -36,13 +36,23 @@ const Checkout = ({ cartItems, onClose, onOrderPlaced }) => {
     const loaded = await loadRazorpayScript();
     if (!loaded) { alert('Razorpay failed to load. Check your internet.'); return; }
 
+    const apiBase = import.meta.env.VITE_API_URL || '';
+
     try {
-      const res = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/create-order`, {
+      const res = await fetch(`${apiBase}/api/payment/create-order`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ amount: totalAmount }),
       });
-      const data = await res.json();
+
+      if (!res.ok) {
+        const errText = await res.text();
+        throw new Error(`Server error ${res.status}: ${errText || 'No response from server'}`);
+      }
+
+      const text = await res.text();
+      if (!text) throw new Error('Empty response from payment server. Make sure the backend is running and VITE_API_URL is set correctly.');
+      const data = JSON.parse(text);
 
       const options = {
         key: import.meta.env.VITE_RAZORPAY_KEY_ID,
@@ -52,12 +62,14 @@ const Checkout = ({ cartItems, onClose, onOrderPlaced }) => {
         description: 'Shoe Purchase',
         order_id: data.orderId,
         handler: async (response) => {
-          const verifyRes = await fetch(`${import.meta.env.VITE_API_URL}/api/payment/verify`, {
+          const verifyRes = await fetch(`${apiBase}/api/payment/verify`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(response),
           });
-          const verifyData = await verifyRes.json();
+          const verifyText = await verifyRes.text();
+          if (!verifyText) { alert('Payment verification failed: empty response from server.'); return; }
+          const verifyData = JSON.parse(verifyText);
           if (verifyData.success) {
             if (onOrderPlaced) onOrderPlaced(cartItems);
             setOrderPlaced(true);

@@ -3,6 +3,7 @@
     { "source": "/preview", "destination": "/", "permanent": true }
   ],
   "rewrites": [
+    { "source": "/api/:path*", "destination": "https://zappify-dz5a.vercel.app/api/:path*" },
     { "source": "/(.*)", "destination": "/index.html" }
   ]
 }

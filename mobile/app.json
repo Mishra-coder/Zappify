@@ -4,7 +4,7 @@
     "slug": "zappify",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/logo.png",
+    "icon": "./assets/logo1.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "updates": {
@@ -16,9 +16,9 @@
       "policy": "appVersion"
     },
     "splash": {
-      "image": "./assets/logo.png",
+      "image": "./assets/logo1.png",
       "resizeMode": "contain",
-      "backgroundColor": "#FF3D00"
+      "backgroundColor": "#000000"
     },
     "ios": {
       "supportsTablet": true,
@@ -29,8 +29,8 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/logo.png",
-        "backgroundColor": "#FF3D00"
+        "foregroundImage": "./assets/logo1.png",
+        "backgroundColor": "#000000"
       },
       "package": "com.zappify.app",
       "edgeToEdgeEnabled": true
