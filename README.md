@@ -16,6 +16,286 @@ Built with a clean MERN stack on the backend and React + React Native on the fro
 
 ---
 
+## Architecture Diagram
+
+```
+┌───────────────────────────────────────────────────────────────────┐
+│                                                                   │
+│  ┌─────────────┐      ┌─────────────┐      ┌─────────────┐        │
+│  │             │      │             │      │             │        │
+│  │  Front-end  │      │  Back-end   │      │  Database   │        │
+│  │             │      │             │      │             │        │
+│  │   ReactJS   │◄────►│   NodeJS    │◄────►│  MongoDB    │        │
+│  │             │      │             │      │             │        │
+│  │UI Components│      │  ExpressJS  │      │ Collections │        │
+│  │             │      │             │      │             │        │
+│  │ API calls   │      │API endpoints│      │  Documents  │        │
+│  │             │      │             │      │             │        │
+│  └─────────────┘      └─────────────┘      └─────────────┘        │
+│                                                                   │
+│  ┌─────────────┐                                                  │
+│  │             │                                                  │
+│  │   Mobile    │                                                  │
+│  │             │                                                  │
+│  │React Native │◄────────────────┐                                │
+│  │             │                 │                                │
+│  │   Expo      │                 │                                │
+│  │             │                 │                                │
+│  └─────────────┘                 │                                │
+│                                  │                                │
+└──────────────────────────────────┼────────────────────────────────┘
+                                   │
+                            Same Backend API
+```
+
+---
+
+## Database Schema
+
+```mermaid
+erDiagram
+Users ||--o{ Orders : places
+Products ||--o{ Orders : included_in
+
+Users {
+  ObjectId _id PK
+  String name
+  String email UK
+  String password
+  Boolean isAdmin
+  DateTime createdAt
+  DateTime updatedAt
+}
+
+Products {
+  ObjectId _id PK
+  ObjectId user FK
+  String name
+  String image
+  String brand
+  String category
+  String description
+  Number price
+  Number countInStock
+  DateTime createdAt
+  DateTime updatedAt
+}
+
+Orders {
+  ObjectId _id PK
+  ObjectId user FK
+  Array orderItems
+  Object shippingAddress
+  String paymentMethod
+  Object paymentResult
+  Number taxPrice
+  Number shippingPrice
+  Number totalPrice
+  Boolean isPaid
+  Date paidAt
+  Boolean isDelivered
+  Date deliveredAt
+  DateTime createdAt
+  DateTime updatedAt
+}
+```
+
+---
+
+## What This Project Does
+
+This is a full-featured e-commerce platform where users can browse premium shoes, add them to cart or wishlist, and complete purchases with integrated payment gateway. The platform is available on both web and mobile (Android) with a unified backend API.
+
+---
+
+## Main Features
+
+### For Customers (Web & Mobile)
+- Create account with email/password or Google OAuth
+- Browse 44+ premium shoe products
+- Search and filter by brand, category, and price
+- Add products to shopping cart
+- Save favorite products to wishlist
+- Multi-step checkout process (Cart → Address → Payment)
+- Razorpay payment integration (Test mode)
+- View order history and status
+- Manage user profile
+- Responsive design for all devices
+
+### For Admins
+- Manage product inventory
+- View and process orders
+- Update order status
+- Monitor sales and analytics
+- User management
+
+---
+
+## Technology Stack
+
+### Frontend (Web)
+- React 19 with Vite
+- React Router for navigation
+- Framer Motion for animations
+- Lucide React for icons
+- Context API for state management
+- Axios for API calls
+
+### Frontend (Mobile)
+- React Native with Expo
+- React Navigation for routing
+- Context API for state management
+- Expo Vector Icons
+- AsyncStorage for local data
+
+### Backend
+- Node.js with Express
+- MongoDB for database
+- Mongoose ODM
+- JWT for authentication
+- Bcrypt for password hashing
+- Razorpay for payments
+- Helmet for security
+- Morgan for logging
+- CORS for cross-origin requests
+
+### DevOps
+- GitHub Actions for CI/CD
+- ESLint for code quality
+- Vercel for deployment
+- Expo EAS for mobile builds
+- OTA updates for mobile app
+
+---
+
+## Development
+
+### Backend Development
+
+```bash
+cd backend
+npm install
+npm run dev
+```
+
+Server runs on http://localhost:5000
+
+**Environment Variables (.env):**
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+RAZORPAY_KEY_ID=your_razorpay_key
+RAZORPAY_KEY_SECRET=your_razorpay_secret
+```
+
+### Frontend Development
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+App runs on http://localhost:5173
+
+**Environment Variables (.env):**
+```env
+VITE_API_URL=http://localhost:5000
+VITE_GOOGLE_CLIENT_ID=your_google_client_id
+```
+
+### Mobile Development
+
+```bash
+cd mobile
+npm install
+npx expo start
+```
+
+Scan QR code with Expo Go app
+
+**Environment Variables:**
+- Configured in `app.json`
+- API URL points to backend server
+
+### Building for Production
+
+**Frontend:**
+```bash
+cd frontend
+npm run build
+```
+
+**Mobile APK:**
+```bash
+cd mobile
+npx eas build --platform android --profile production
+```
+
+**OTA Update (Mobile):**
+```bash
+cd mobile
+npx eas update --branch production --message "Update description"
+```
+
+---
+
+## Project Structure
+
+```
+Zappify/
+├── .github/
+│   └── workflows/
+│       └── ci.yml              # GitHub Actions CI pipeline
+├── frontend/                   # React Web Application
+│   ├── src/
+│   │   ├── components/         # Reusable UI components
+│   │   ├── data/               # Static product data
+│   │   └── App.jsx             # Main app component
+│   ├── public/                 # Static assets
+│   └── package.json
+├── backend/                    # Node.js/Express API
+│   ├── config/                 # Database configuration
+│   ├── controllers/            # Request handlers
+│   ├── middlewares/            # Auth and validation
+│   ├── models/                 # MongoDB schemas
+│   ├── routes/                 # API routes
+│   ├── utils/                  # Helper functions
+│   └── server.js               # Entry point
+└── mobile/                     # React Native Mobile App
+    ├── src/
+    │   ├── components/         # Mobile UI components
+    │   ├── screens/            # App screens
+    │   ├── context/            # State management
+    │   └── data/               # Product data
+    └── App.js                  # Main app component
+```
+
+---
+
+## API Endpoints
+
+### Authentication
+- `POST /api/users/register` - Register new user
+- `POST /api/users/login` - Login user
+- `POST /api/users/google` - Google OAuth login
+
+### Products
+- `GET /api/products` - Get all products
+- `GET /api/products/:id` - Get single product
+
+### Orders
+- `POST /api/orders` - Create new order
+- `GET /api/orders/:id` - Get order details
+- `GET /api/orders/user/:userId` - Get user's orders
+
+### Payments
+- `POST /api/payment/create-order` - Create Razorpay order
+- `POST /api/payment/verify` - Verify payment
+
+---
+
 ## Technology Stack
 
 ### Frontend (Web)
