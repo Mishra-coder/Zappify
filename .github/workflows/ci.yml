@@ -9,7 +9,7 @@ on:
 env:
   AWS_REGION: us-east-1
   ECR_REPOSITORY: zappify-backend
-  ECS_CLUSTER: zappify-cluster
+  ECS_CLUSTER: zappify-cluster-v3
   ECS_SERVICE: zappify-backend-service
   CONTAINER_NAME: zappify-backend
 
