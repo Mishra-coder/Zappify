@@ -8,4 +8,9 @@ const validateEmail = (email) => {
   return true;
 };
 
-module.exports = { validateEmail };
+const validatePassword = (password) => {
+  if (!password) return false;
+  return password.length >= 6;
+};
+
+module.exports = { validateEmail, validatePassword };

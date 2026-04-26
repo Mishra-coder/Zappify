@@ -28,6 +28,15 @@ app.get('/', (req, res) => {
     res.send("API is running...");
 });
 
+// Health check endpoint for ECS/Docker
+app.get('/health', (req, res) => {
+    res.status(200).json({
+        status: 'healthy',
+        timestamp: new Date().toISOString(),
+        uptime: process.uptime(),
+    });
+});
+
 app.use((err, req, res, next) => {
     const statusCode = res.statusCode === 200 ? 500 : res.statusCode;
     res.status(statusCode).json({
