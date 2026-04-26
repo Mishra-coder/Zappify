@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 env:
-  AWS_REGION: ap-south-1
+  AWS_REGION: us-east-1
   ECR_REPOSITORY: zappify-backend
   ECS_CLUSTER: zappify-cluster
   ECS_SERVICE: zappify-backend-service
