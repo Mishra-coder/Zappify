@@ -1,0 +1,42 @@
+{
+    "family": "zappify-backend",
+    "networkMode": "awsvpc",
+    "containerDefinitions": [
+        {
+            "name": "zappify-backend",
+            "image": "185259096541.dkr.ecr.us-east-1.amazonaws.com/zappify-backend:latest",
+            "portMappings": [
+                {
+                    "containerPort": 5001,
+                    "hostPort": 5001,
+                    "protocol": "tcp"
+                }
+            ],
+            "essential": true,
+            "environment": [
+                { "name": "NODE_ENV", "value": "production" },
+                { "name": "PORT", "value": "5001" }
+            ],
+            "logConfiguration": {
+                "logDriver": "awslogs",
+                "options": {
+                    "awslogs-group": "/ecs/zappify-backend",
+                    "awslogs-region": "us-east-1",
+                    "awslogs-stream-prefix": "ecs"
+                }
+            },
+            "healthCheck": {
+                "command": [ "CMD-SHELL", "wget -qO- http://localhost:5001/health || exit 1" ],
+                "interval": 30,
+                "timeout": 5,
+                "retries": 3,
+                "startPeriod": 10
+            }
+        }
+    ],
+    "requiresCompatibilities": [ "FARGATE" ],
+    "cpu": "256",
+    "memory": "512",
+    "executionRoleArn": "arn:aws:iam::185259096541:role/LabRole",
+    "taskRoleArn": "arn:aws:iam::185259096541:role/LabRole"
+}
