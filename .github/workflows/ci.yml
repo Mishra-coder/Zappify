@@ -80,12 +80,13 @@ jobs:
   # ─────────────────────────────────────────────
   # JOB 3: Docker Build → ECR → ECS Deploy (Backend + Frontend)
   # Runs only on push to main (not on PRs)
+  # DISABLED for AWS Academy (tokens expire frequently)
   # ─────────────────────────────────────────────
   deploy:
     name: Build → Push ECR → Deploy ECS
     runs-on: ubuntu-latest
     needs: [backend, frontend]
-    if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+    if: false  # Disabled - Manual deployment required for AWS Academy
 
     steps:
       - name: Checkout code
